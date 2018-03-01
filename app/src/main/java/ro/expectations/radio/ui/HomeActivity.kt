@@ -1,7 +1,8 @@
-package ro.expectations.radio
+package ro.expectations.radio.ui
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import ro.expectations.radio.R
 
 class HomeActivity : AppCompatActivity() {
 
