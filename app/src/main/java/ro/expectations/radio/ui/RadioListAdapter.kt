@@ -6,27 +6,41 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import ro.expectations.radio.R
+import ro.expectations.radio.model.Radio
 
-class RadioListAdapter(private val radioStations: ArrayList<String>) : RecyclerView.Adapter<RadioListAdapter.ViewHolder>() {
+class RadioListAdapter(radios: ArrayList<Radio>) : RecyclerView.Adapter<RadioListAdapter.ViewHolder>() {
+
+    var radios: ArrayList<Radio> = radios
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.radio_list_item, parent, false)
         return ViewHolder(view)
     }
 
-    override fun getItemCount() = radioStations.size
+    override fun getItemCount() = radios.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val radioStation = radioStations[position]
+        val radioStation = radios[position]
         holder.bind(radioStation)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private var name: TextView = itemView.findViewById(R.id.name)
+        private var description: TextView = itemView.findViewById(R.id.description)
 
-        fun bind(radioName: String) = with(itemView) {
-            name.text = radioName
+        fun bind(radio: Radio) = with(itemView) {
+            name.text = radio.name
+            if (!radio.slogan.isEmpty()) {
+                description.text = radio.slogan
+                description.visibility = View.VISIBLE
+            } else {
+                description.visibility = View.GONE
+            }
         }
     }
 }
