@@ -21,7 +21,7 @@ android {
 }
 
 ext {
-    support_lib_version = '27.0.2'
+    support_lib_version = '27.1.0'
     firebase_version = '11.8.0'
 }
 
