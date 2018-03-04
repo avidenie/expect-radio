@@ -1,24 +1,20 @@
 package ro.expectations.radio.ui
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import ro.expectations.radio.R
-import ro.expectations.radio.model.Radio
+import ro.expectations.radio.data.RadioListViewModel
+import ro.expectations.radio.data.Resource
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: RadioListAdapter
-
-    private var firestore = FirebaseFirestore.getInstance()
-    private lateinit var registration: ListenerRegistration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,27 +28,12 @@ class HomeActivity : AppCompatActivity() {
 
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.setHasFixedSize(true)
-    }
 
-    override fun onStart() {
-        super.onStart()
-        registration = firestore.collection("radio-stations").addSnapshotListener(listener)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        registration.remove()
-    }
-
-    private val listener = EventListener<QuerySnapshot> { snapshots, e ->
-        if (e != null) {
-            return@EventListener
-        }
-        val radios = arrayListOf<Radio>()
-        for (doc in snapshots) {
-            val radio = Radio(doc.id, doc.getString("name"), doc.getString("slogan"))
-            radios.add(radio)
-        }
-        adapter.radios = radios
+        val viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(RadioListViewModel::class.java)
+        viewModel.radios.observe(this, Observer { resource ->
+            if (resource?.status == Resource.Status.SUCCESS) {
+                adapter.radios = ArrayList(resource.data)
+            }
+        })
     }
 }
