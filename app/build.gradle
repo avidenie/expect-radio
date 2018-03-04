@@ -41,6 +41,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.1.0"
 
     // Firebase
+    implementation "com.google.firebase:firebase-auth:$firebase_version"
     implementation "com.google.firebase:firebase-firestore:$firebase_version"
 
     // Testing
