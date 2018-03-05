@@ -15,7 +15,11 @@ class RadioListViewModel : ViewModel() {
         val data = MutableLiveData<Resource<List<Radio>>>()
         if (resource.status == Resource.Status.SUCCESS) {
             val radios = resource.data?.map { radio ->
-                Radio(radio.id, radio.getString("name") ?: "", radio.getString("slogan") ?: "")
+                Radio(
+                        radio.id,
+                        radio.getString("name") ?: "",
+                        radio.getString("logo"),
+                        radio.getString("slogan") ?: "")
             }
             data.value = Resource.success(radios)
         } else {

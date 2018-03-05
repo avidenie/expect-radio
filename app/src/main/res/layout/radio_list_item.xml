@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,18 +13,17 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/logo"
         android:layout_width="40dp"
         android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@null"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        app:roundAsCircle="true"
+        fresco:placeholderImage="@mipmap/ic_launcher_round"
+        />
 
     <TextView
         android:id="@+id/name"
