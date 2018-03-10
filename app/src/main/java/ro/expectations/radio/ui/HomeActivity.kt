@@ -1,63 +1,68 @@
 package ro.expectations.radio.ui
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_home.*
 import ro.expectations.radio.R
-import ro.expectations.radio.data.RadioListViewModel
-import ro.expectations.radio.data.Resource
+import ro.expectations.radio.service.RadioService.Companion.RADIO_BROWSER_ROOT
 
-class HomeActivity : AppCompatActivity() {
 
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var linearLayoutManager: LinearLayoutManager
-    private lateinit var adapter: RadioListAdapter
+class HomeActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "HomeActivity"
     }
 
+    private lateinit var adapter: RadioListAdapter
+    private val controllerCallback = MediaControllerCallback()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_home)
 
-        linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = RadioListAdapter(ArrayList())
         recyclerView.adapter = adapter
 
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.setHasFixedSize(true)
-
-        firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser = firebaseAuth.currentUser
-        if (currentUser != null) {
-            initRadioList()
-        } else {
-            firebaseAuth.signInAnonymously().addOnCompleteListener(this, { task ->
-                if (task.isSuccessful) {
-                    initRadioList()
-                } else {
-                    Log.w(TAG, "signInAnonymously:failure", task.exception)
-                }
-            })
-        }
     }
 
-    private fun initRadioList() {
-        val viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-                .create(RadioListViewModel::class.java)
-        viewModel.radios.observe(this, Observer { resource ->
-            if (resource?.status == Resource.Status.SUCCESS) {
-                adapter.radios = ArrayList(resource.data)
+    override fun onConnected() {
+
+        mediaBrowser.subscribe(RADIO_BROWSER_ROOT, object : MediaBrowserCompat.SubscriptionCallback() {
+
+            override fun onChildrenLoaded(parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>) {
+                super.onChildrenLoaded(parentId, children)
+                adapter.radios = ArrayList(children)
             }
         })
     }
+
+    override fun onStop() {
+        super.onStop()
+
+        MediaControllerCompat.getMediaController(this)?.unregisterCallback(controllerCallback)
+    }
+
+    private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
+
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            Log.d(TAG, "MediaControllerCompat.Callback::onMetadataChanged -> ${metadata?.toString()}")
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            Log.d(TAG, "MediaControllerCompat.Callback::onMetadataChanged -> ${state?.toString()}")
+        }
+    }
+
 }
+

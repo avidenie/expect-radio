@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:roundAsCircle="true"
-        fresco:placeholderImage="@mipmap/ic_launcher_round"
+        fresco:placeholderImage="@mipmap/ic_launcher"
         />
 
     <TextView

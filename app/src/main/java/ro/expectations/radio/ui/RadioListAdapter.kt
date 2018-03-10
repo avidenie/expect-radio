@@ -1,7 +1,7 @@
 package ro.expectations.radio.ui
 
+import android.support.v4.media.MediaBrowserCompat
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +9,15 @@ import android.widget.TextView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.google.firebase.storage.FirebaseStorage
 import ro.expectations.radio.R
-import ro.expectations.radio.model.Radio
+import ro.expectations.radio.utilities.Logger
 
-class RadioListAdapter(radios: ArrayList<Radio>) : RecyclerView.Adapter<RadioListAdapter.ViewHolder>() {
+class RadioListAdapter(radios: ArrayList<MediaBrowserCompat.MediaItem>) : RecyclerView.Adapter<RadioListAdapter.ViewHolder>() {
 
     companion object {
         private const val TAG = "RadioListAdapter"
     }
 
-    var radios: ArrayList<Radio> = radios
+    var radios: ArrayList<MediaBrowserCompat.MediaItem> = radios
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -41,24 +41,28 @@ class RadioListAdapter(radios: ArrayList<Radio>) : RecyclerView.Adapter<RadioLis
         private var logo = itemView.findViewById(R.id.logo) as SimpleDraweeView
         private var description = itemView.findViewById(R.id.description) as TextView
 
-        fun bind(radio: Radio) = with(itemView) {
+        fun bind(radio: MediaBrowserCompat.MediaItem) = with(itemView) {
 
-            name.text = radio.name
+            name.text = radio.description.title
 
-            if (radio.logo != null) {
+            if (radio.description.iconUri != null) {
                 val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://${resources.getString(R.string.google_storage_bucket)}")
-                storageRef.child(radio.logo).downloadUrl.addOnSuccessListener({ uri ->
+                storageRef.child(radio.description.iconUri.toString()).downloadUrl.addOnSuccessListener({ uri ->
                     logo.setImageURI(uri, null)
                 }).addOnFailureListener({ exception ->
-                    Log.e(TAG, "Could not load ${exception.message}")
+                    Logger.e(TAG, "Could not load ${exception.message}")
                 })
             }
 
-            if (!radio.slogan.isEmpty()) {
-                description.text = radio.slogan
-                description.visibility = View.VISIBLE
-            } else {
+            if (radio.description.iconUri != null) {
+                logo.setImageURI(radio.description.iconUri, null)
+            }
+
+            if (radio.description.subtitle.isNullOrEmpty()) {
                 description.visibility = View.GONE
+            } else {
+                description.text = radio.description.subtitle
+                description.visibility = View.VISIBLE
             }
         }
     }
