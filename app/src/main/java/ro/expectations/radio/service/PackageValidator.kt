@@ -13,18 +13,14 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
 
-class PackageValidator(ctx: Context) {
+class PackageValidator(context: Context) {
 
     companion object {
         private const val TAG = "PackageValidator"
     }
 
-    private val validCertificates: Map<String, ArrayList<CallerInfo>>
-
-    init {
-        validCertificates = readValidCertificates(ctx.resources.getXml(
-                R.xml.allowed_media_browser_callers))
-    }
+    private val validCertificates: Map<String, ArrayList<CallerInfo>> = readValidCertificates(
+            context.resources.getXml(R.xml.allowed_media_browser_callers))
 
     private fun readValidCertificates(parser: XmlResourceParser): Map<String, ArrayList<CallerInfo>> {
         val validCertificates = HashMap<String, ArrayList<CallerInfo>>()
