@@ -4,11 +4,15 @@ import android.content.ComponentName
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import ro.expectations.radio.service.RadioService
 import ro.expectations.radio.utilities.Logger
+import java.util.*
+import kotlin.concurrent.schedule
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -87,16 +91,39 @@ abstract class BaseActivity : AppCompatActivity() {
             // Save the controller
             MediaControllerCompat.setMediaController(this@BaseActivity, mediaController)
 
+            mediaController.registerCallback(object : MediaControllerCompat.Callback() {
+                override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+                    super.onMetadataChanged(metadata)
+
+                    Logger.e(TAG, "onMetadataChanged: $metadata")
+                }
+
+                override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+                    super.onPlaybackStateChanged(state)
+
+                    Logger.e(TAG, "onPlaybackStateChanged: $state")
+                }
+            })
+
             // Allow children classes to perform more actions when connected
             this@BaseActivity.onConnected()
+
+            val timer = Timer("schedule", true)
+            timer.schedule(3000) {
+                mediaController.transportControls.play()
+            }
         }
 
         override fun onConnectionSuspended() {
             // The Service has crashed. Disable transport controls until it automatically reconnects
+
+            Logger.e(TAG, "MediaBrowserCompat.ConnectionCallback::onConnectionSuspended()")
         }
 
         override fun onConnectionFailed() {
             // The Service has refused our connection
+
+            Logger.e(TAG, "MediaBrowserCompat.ConnectionCallback::onConnectionFailed()")
         }
     }
 }

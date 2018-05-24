@@ -9,26 +9,22 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class RadioProvider(private val firestore: FirebaseFirestore) {
 
-    companion object {
-        private const val TAG = "RadioProvider"
-    }
-
-    val radios : LiveData<Resource<List<MediaMetadataCompat>>>
+    val radios : LiveData<Resource<List<RadioStation>>>
         get() {
             val liveData = FirestoreQueryLiveData(firestore.collection("radio-stations"))
 
             return Transformations.switchMap(liveData, { resource ->
 
-                val data = MutableLiveData<Resource<List<MediaMetadataCompat>>>()
+                val data = MutableLiveData<Resource<List<RadioStation>>>()
                 if (resource.status == Resource.Status.SUCCESS) {
                     val radios = resource.data?.map { radio ->
-
-                        MediaMetadataCompat.Builder()
-                                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, radio.id)
-                                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, radio.getString("name") ?: "")
-                                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, radio.getString("slogan") ?: "")
-                                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, radio.getString("logo") ?: "")
-                                .build()
+                        RadioStation(
+                            radio.id,
+                            radio.getString("name") ?: "",
+                            radio.getString("slogan") ?: "",
+                            radio.getString("logo") ?: "",
+                            radio.getString("source") ?: ""
+                        )
                     }
                     data.value = Resource.success(radios)
                 } else {

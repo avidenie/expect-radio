@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Expect Radio</string>
+    <string name="label_play">Play</string>
+    <string name="label_pause">Pause</string>
+    <string name="label_next">Next</string>
+    <string name="label_previous">Previous</string>
 </resources>
