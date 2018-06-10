@@ -1,10 +1,10 @@
 package ro.expectations.radio.application
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.firebase.FirebaseApp
 
-class CustomApplication : Application() {
+class CustomApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
