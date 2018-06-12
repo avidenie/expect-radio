@@ -2,6 +2,7 @@ package ro.expectations.radio.service
 
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
@@ -75,6 +76,7 @@ class RadioService : LifecycleMediaBrowserService() {
                                     .setMediaId(radio.id)
                                     .setTitle(radio.name)
                                     .setSubtitle(radio.slogan)
+                                    .setIconUri(Uri.parse(radio.logo))
                                     .build()
                             mediaItems.add(MediaBrowserCompat.MediaItem(description,
                                     MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))

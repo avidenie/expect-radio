@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.facebook.drawee.view.SimpleDraweeView
-import com.google.firebase.storage.FirebaseStorage
 import ro.expectations.radio.R
-import ro.expectations.radio.utilities.Logger
 
 class RadioListAdapter(radios: ArrayList<MediaBrowserCompat.MediaItem>) : RecyclerView.Adapter<RadioListAdapter.ViewHolder>() {
 
@@ -44,19 +42,7 @@ class RadioListAdapter(radios: ArrayList<MediaBrowserCompat.MediaItem>) : Recycl
         fun bind(radio: MediaBrowserCompat.MediaItem) = with(itemView) {
 
             name.text = radio.description.title
-
-            if (radio.description.iconUri != null) {
-                val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://${resources.getString(R.string.google_storage_bucket)}")
-                storageRef.child(radio.description.iconUri.toString()).downloadUrl.addOnSuccessListener({ uri ->
-                    logo.setImageURI(uri, null)
-                }).addOnFailureListener({ exception ->
-                    Logger.e(TAG, "Could not load ${exception.message}")
-                })
-            }
-
-            if (radio.description.iconUri != null) {
-                logo.setImageURI(radio.description.iconUri, null)
-            }
+            logo.setImageURI(radio.description.iconUri, null)
 
             if (radio.description.subtitle.isNullOrEmpty()) {
                 description.visibility = View.GONE
