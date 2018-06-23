@@ -17,7 +17,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import ro.expectations.radio.R
 import ro.expectations.radio.service.RadioService
-import ro.expectations.radio.service.playback.LocalPlayback
 import ro.expectations.radio.ui.HomeActivity
 import ro.expectations.radio.utilities.Logger
 
