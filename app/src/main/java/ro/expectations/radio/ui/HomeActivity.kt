@@ -60,7 +60,7 @@ class HomeActivity : BaseActivity() {
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            Log.d(TAG, "MediaControllerCompat.Callback::onMetadataChanged -> ${state?.toString()}")
+            Log.d(TAG, "MediaControllerCompat.Callback::onPlaybackStateChanged -> ${state?.toString()}")
         }
     }
 
