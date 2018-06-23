@@ -13,17 +13,17 @@ class RadioProvider(private val firestore: FirebaseFirestore) {
         get() {
             val liveData = FirestoreQueryLiveData(firestore.collection("radio-stations"))
 
-            return Transformations.switchMap(liveData, { resource ->
+            return Transformations.switchMap(liveData) { resource ->
 
                 val data = MutableLiveData<Resource<List<RadioStation>>>()
                 if (resource.status == Resource.Status.SUCCESS) {
                     val radios = resource.data?.map { radio ->
                         RadioStation(
-                            radio.id,
-                            radio.getString("name") ?: "",
-                            radio.getString("slogan") ?: "",
-                            radio.getString("logo") ?: "",
-                            radio.getString("source") ?: ""
+                                radio.id,
+                                radio.getString("name") ?: "",
+                                radio.getString("slogan") ?: "",
+                                radio.getString("logo") ?: "",
+                                radio.getString("source") ?: ""
                         )
                     }
                     data.value = Resource.success(radios)
@@ -31,6 +31,6 @@ class RadioProvider(private val firestore: FirebaseFirestore) {
                     data.value = Resource.error(resource.exception)
                 }
                 data
-            })
+            }
         }
 }

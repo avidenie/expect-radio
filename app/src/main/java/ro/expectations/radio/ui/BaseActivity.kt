@@ -33,13 +33,13 @@ abstract class BaseActivity : AppCompatActivity() {
         val firebaseAuth = FirebaseAuth.getInstance()
         val currentUser = firebaseAuth.currentUser
         if (currentUser == null) {
-            firebaseAuth.signInAnonymously().addOnCompleteListener(this, { task ->
+            firebaseAuth.signInAnonymously().addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     onAuthenticated()
                 } else {
                     Logger.e(TAG, task.exception as Throwable, "Firebase signInAnonymously failure")
                 }
-            })
+            }
         } else {
             onAuthenticated()
         }

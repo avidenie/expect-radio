@@ -96,13 +96,13 @@ class RadioService : LifecycleMediaBrowserService() {
 
         val firebaseAuth = FirebaseAuth.getInstance()
         if (firebaseAuth.currentUser == null) {
-            firebaseAuth.signInAnonymously().addOnCompleteListener({ task ->
+            firebaseAuth.signInAnonymously().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onAuthenticated()
                 } else {
                     Logger.e(TAG, task.exception as Throwable, "Firebase signInAnonymously failure")
                 }
-            })
+            }
         } else {
             onAuthenticated()
         }
