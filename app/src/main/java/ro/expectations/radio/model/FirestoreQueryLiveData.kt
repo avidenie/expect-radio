@@ -1,12 +1,10 @@
 package ro.expectations.radio.model
 
 import android.arch.lifecycle.LiveData
-import android.util.Log
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
-import ro.expectations.radio.utilities.Logger
 
 class FirestoreQueryLiveData(private var query: Query) : LiveData<Resource<QuerySnapshot>>() {
 

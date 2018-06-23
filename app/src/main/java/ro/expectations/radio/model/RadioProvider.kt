@@ -3,7 +3,6 @@ package ro.expectations.radio.model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.support.v4.media.MediaMetadataCompat
 import com.google.firebase.firestore.FirebaseFirestore
 
 
