@@ -25,7 +25,7 @@ abstract class LifecycleMediaBrowserService : MediaBrowserServiceCompat(), Lifec
         return super.onBind(intent)
     }
 
-    @SuppressWarnings("deprecation")
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     @CallSuper
     override fun onStart(intent: Intent, startId: Int) {
         dispatcher.onServicePreSuperOnStart()
