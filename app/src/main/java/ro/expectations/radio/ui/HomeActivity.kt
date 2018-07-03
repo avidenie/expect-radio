@@ -10,7 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_home.*
 import ro.expectations.radio.R
-import ro.expectations.radio.service.RadioService.Companion.RADIO_BROWSER_ROOT
+import ro.expectations.radio.service.RADIO_BROWSER_SERVICE_ROOT
 
 
 class HomeActivity : BaseActivity() {
@@ -38,7 +38,7 @@ class HomeActivity : BaseActivity() {
 
     override fun onConnected() {
 
-        mediaBrowser.subscribe(RADIO_BROWSER_ROOT, object : MediaBrowserCompat.SubscriptionCallback() {
+        mediaBrowser.subscribe(RADIO_BROWSER_SERVICE_ROOT, object : MediaBrowserCompat.SubscriptionCallback() {
 
             override fun onChildrenLoaded(parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>) {
                 super.onChildrenLoaded(parentId, children)

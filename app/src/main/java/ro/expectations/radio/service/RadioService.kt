@@ -21,13 +21,12 @@ import ro.expectations.radio.service.playback.Playback
 import ro.expectations.radio.utilities.Logger
 
 
-class RadioService : LifecycleMediaBrowserService() {
+private const val TAG = "RadioService"
 
-    companion object {
-        private const val TAG = "RadioService"
-        const val RADIO_BROWSER_EMPTY_ROOT = "__EMPTY_ROOT__"
-        const val RADIO_BROWSER_ROOT = "__ROOT__"
-    }
+private const val RADIO_BROWSER_SERVICE_EMPTY_ROOT = "__EMPTY_ROOT__"
+const val RADIO_BROWSER_SERVICE_ROOT = "__ROOT__"
+
+class RadioService : LifecycleMediaBrowserService() {
 
     private lateinit var packageValidator: PackageValidator
     private lateinit var radioProvider: RadioProvider
@@ -57,14 +56,14 @@ class RadioService : LifecycleMediaBrowserService() {
                     |OnGetRoot: Browsing NOT ALLOWED for unknown caller $clientPackageName.
                     |Returning empty browser root so all apps can use MediaController.
                     """.trimMargin())
-             return MediaBrowserServiceCompat.BrowserRoot(RADIO_BROWSER_EMPTY_ROOT, null)
+             return MediaBrowserServiceCompat.BrowserRoot(RADIO_BROWSER_SERVICE_EMPTY_ROOT, null)
         }
 
-        return MediaBrowserServiceCompat.BrowserRoot(RADIO_BROWSER_ROOT, null)
+        return MediaBrowserServiceCompat.BrowserRoot(RADIO_BROWSER_SERVICE_ROOT, null)
     }
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-        when (RADIO_BROWSER_EMPTY_ROOT) {
+        when (RADIO_BROWSER_SERVICE_EMPTY_ROOT) {
             parentId -> result.sendResult(ArrayList())
             else -> {
                 if (radioResource?.status == Resource.Status.SUCCESS) {
@@ -111,7 +110,7 @@ class RadioService : LifecycleMediaBrowserService() {
     private fun onAuthenticated() {
         radioProvider.radios.observe(this, Observer { resource ->
             radioResource = resource
-            notifyChildrenChanged(RADIO_BROWSER_ROOT)
+            notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
         })
     }
 
