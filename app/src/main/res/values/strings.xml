@@ -4,4 +4,6 @@
     <string name="label_pause">Pause</string>
     <string name="label_next">Next</string>
     <string name="label_previous">Previous</string>
+    <string name="notification_channel">Now Playing</string>
+    <string name="notification_channel_description">Shows what radio station is currently playing in Expect Radio</string>
 </resources>

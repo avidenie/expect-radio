@@ -107,11 +107,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
             // Allow children classes to perform more actions when connected
             this@BaseActivity.onConnected()
-
-            val timer = Timer("schedule", true)
-            timer.schedule(3000) {
-                mediaController.transportControls.play()
-            }
         }
 
         override fun onConnectionSuspended() {
