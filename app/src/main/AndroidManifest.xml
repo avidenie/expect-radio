@@ -19,23 +19,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.RadioService">
-            <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
-            </intent-filter>
-        </service>
-
-        <!--
-            MediaSession, prior to API 21, uses a broadcast receiver to communicate with a
-            media session. Additionally, this is used to resume the service from an inactive
-            state upon receiving a media button event (such as "play").
-        -->
-        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

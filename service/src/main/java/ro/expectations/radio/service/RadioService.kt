@@ -26,11 +26,11 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import ro.expectations.radio.common.Logger
 import ro.expectations.radio.extensions.stateName
 import ro.expectations.radio.model.RadioProvider
 import ro.expectations.radio.model.RadioStation
 import ro.expectations.radio.model.Resource
-import ro.expectations.radio.utilities.Logger
 
 
 private const val TAG = "RadioService"

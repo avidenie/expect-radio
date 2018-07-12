@@ -7,17 +7,15 @@ import android.content.res.XmlResourceParser
 import android.os.Process
 import android.util.Base64
 import org.xmlpull.v1.XmlPullParserException
-import ro.expectations.radio.R
-import ro.expectations.radio.utilities.Logger
+import ro.expectations.radio.common.Logger
 import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
 
-class PackageValidator(context: Context) {
 
-    companion object {
-        private const val TAG = "PackageValidator"
-    }
+private const val TAG = "PackageValidator"
+
+class PackageValidator(context: Context) {
 
     private val validCertificates: Map<String, ArrayList<CallerInfo>> = readValidCertificates(
             context.resources.getXml(R.xml.allowed_media_browser_callers))

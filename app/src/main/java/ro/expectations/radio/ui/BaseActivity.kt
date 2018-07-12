@@ -9,10 +9,9 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.RadioService
-import ro.expectations.radio.utilities.Logger
-import java.util.*
-import kotlin.concurrent.schedule
+
 
 abstract class BaseActivity : AppCompatActivity() {
 

@@ -1,7 +1,7 @@
-package ro.expectations.radio.utilities
+package ro.expectations.radio.common
 
 import android.util.Log
-import ro.expectations.radio.BuildConfig
+
 
 class Logger {
 

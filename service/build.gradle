@@ -1,6 +1,5 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
@@ -8,22 +7,13 @@ android {
 
     defaultConfig {
 
-        applicationId "ro.expectations.radio"
-
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
         versionCode rootProject.versionCode
         versionName rootProject.versionName
 
-        vectorDrawables.useSupportLibrary = true
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
     }
 
     buildTypes {
@@ -38,16 +28,13 @@ dependencies {
 
     // Project libraries
     implementation project(':common')
-    implementation project(':service')
 
     // Kotlin Programming Language
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
 
     // Android support libraries
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     // Architecture components
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
@@ -57,13 +44,17 @@ dependencies {
     implementation "com.google.firebase:firebase-auth:$rootProject.firebaseAuthVersion"
     implementation "com.google.firebase:firebase-firestore:$rootProject.firebaseFirestoreVersion"
 
-    // Facebook Fresco
-    implementation 'com.facebook.fresco:fresco:1.9.0'
+    // ExoPlayer
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.8.1'
+    implementation 'com.google.android.exoplayer:extension-mediasession:2.8.1'
 
     // Testing
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
 }
 
-apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}

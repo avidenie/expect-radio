@@ -3,15 +3,13 @@ package ro.expectations.radio.service
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.PlaybackPreparer.ACTIONS
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
-import ro.expectations.radio.utilities.Logger
+import ro.expectations.radio.common.Logger
+
 
 private const val TAG = "PlaybackPreparer"
 

@@ -11,7 +11,6 @@ import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import ro.expectations.radio.R
 import ro.expectations.radio.extensions.isPlayEnabled
 import ro.expectations.radio.extensions.isPlaying
 import ro.expectations.radio.extensions.isSkipToNextEnabled
