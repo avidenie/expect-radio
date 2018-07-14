@@ -11,10 +11,11 @@ import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import ro.expectations.radio.extensions.isPlayEnabled
-import ro.expectations.radio.extensions.isPlaying
-import ro.expectations.radio.extensions.isSkipToNextEnabled
-import ro.expectations.radio.extensions.isSkipToPreviousEnabled
+import ro.expectations.radio.service.extensions.isPlayEnabled
+import ro.expectations.radio.service.extensions.isPlaying
+import ro.expectations.radio.service.extensions.isSkipToNextEnabled
+import ro.expectations.radio.service.extensions.isSkipToPreviousEnabled
+
 
 private const val NOW_PLAYING_CHANNEL_ID: String = "ro.expectations.radio.notifications.NOW_PLAYING"
 const val NOW_PLAYING_NOTIFICATION_ID: Int = 10000

@@ -7,12 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -27,10 +25,9 @@ import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import ro.expectations.radio.common.Logger
-import ro.expectations.radio.extensions.stateName
-import ro.expectations.radio.model.RadioProvider
-import ro.expectations.radio.model.RadioStation
-import ro.expectations.radio.model.Resource
+import ro.expectations.radio.service.extensions.stateName
+import ro.expectations.radio.service.model.RadioProvider
+import ro.expectations.radio.service.model.Resource
 
 
 private const val TAG = "RadioService"
@@ -51,7 +48,7 @@ class RadioService : LifecycleMediaBrowserService() {
 
     private var isForegroundService = false
 
-    private var radioResource : Resource<List<RadioStation>>? = null
+    private var radioResource : Resource<List<MediaBrowserCompat.MediaItem>>? = null
 
     private val exoPlayer: ExoPlayer by lazy {
         ExoPlayerFactory.newSimpleInstance(
@@ -82,26 +79,17 @@ class RadioService : LifecycleMediaBrowserService() {
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
         when (RADIO_BROWSER_SERVICE_EMPTY_ROOT) {
-            parentId -> result.sendResult(ArrayList())
+            parentId -> result.sendResult(arrayListOf())
             else -> {
                 if (radioResource?.status == Resource.Status.SUCCESS) {
                     val mediaItems = ArrayList<MediaBrowserCompat.MediaItem>()
-                    val resourceData = radioResource?.data
-                    if (resourceData != null) {
-                        for (radio in resourceData) {
-                            val description = MediaDescriptionCompat.Builder()
-                                    .setMediaId(radio.id)
-                                    .setTitle(radio.name)
-                                    .setSubtitle(radio.slogan)
-                                    .setIconUri(Uri.parse(radio.logo))
-                                    .build()
-                            mediaItems.add(MediaBrowserCompat.MediaItem(description,
-                                    MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
-                        }
+                    if (radioResource?.data != null) {
+                        result.sendResult(mediaItems)
+                    } else {
+                        result.sendResult(arrayListOf())
                     }
-                    result.sendResult(mediaItems)
                 } else {
-                    result.sendResult(ArrayList())
+                    result.sendResult(arrayListOf())
                 }
             }
         }
@@ -183,13 +171,7 @@ class RadioService : LifecycleMediaBrowserService() {
             if (resourceData != null) {
                 var index = 0L
                 for (radio in resourceData) {
-                    val description = MediaDescriptionCompat.Builder()
-                            .setMediaId(radio.id)
-                            .setTitle(radio.name)
-                            .setSubtitle(radio.slogan)
-                            .setMediaUri(Uri.parse(radio.source))
-                            .build()
-                    val queueItem = MediaSessionCompat.QueueItem(description, index++)
+                    val queueItem = MediaSessionCompat.QueueItem(radio.description, index++)
                     queue.add(queueItem)
                 }
             }

@@ -13,11 +13,9 @@ import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.RadioService
 
 
-abstract class BaseActivity : AppCompatActivity() {
+private const val TAG = "BaseActivity"
 
-    companion object {
-        private const val TAG = "BaseActivity"
-    }
+abstract class BaseActivity : AppCompatActivity() {
 
     private var shouldConnect = false
     protected lateinit var mediaBrowser : MediaBrowserCompat

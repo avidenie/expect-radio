@@ -1,4 +1,4 @@
-package ro.expectations.radio.extensions
+package ro.expectations.radio.service.extensions
 
 import android.support.v4.media.session.PlaybackStateCompat
 

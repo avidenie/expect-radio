@@ -1,4 +1,4 @@
-package ro.expectations.radio.model
+package ro.expectations.radio.service.model
 
 class Resource<T> private constructor(val status: Status, val data: T?, val exception: AppException?) {
 
