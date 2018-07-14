@@ -44,6 +44,7 @@ class RadioService : LifecycleMediaBrowserService() {
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
+    private lateinit var playbackPreparer: PlaybackPreparer
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
     private var isForegroundService = false
@@ -113,8 +114,11 @@ class RadioService : LifecycleMediaBrowserService() {
     }
 
     private fun onAuthenticated() {
+        Logger.e(TAG, "onAuthenticated")
         radioProvider.radios.observe(this, Observer { resource ->
+            Logger.e(TAG, "")
             radioResource = resource
+            playbackPreparer.radioResource = radioResource
             notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
             enforceQueue()
         })
@@ -154,7 +158,8 @@ class RadioService : LifecycleMediaBrowserService() {
                     this, Util.getUserAgent(this, EXPECT_RADIO_USER_AGENT), null)
 
             // Create the PlaybackPreparer of the media session connector.
-            val playbackPreparer = PlaybackPreparer(
+            playbackPreparer = PlaybackPreparer(
+                    radioResource,
                     exoPlayer,
                     dataSourceFactory)
 
