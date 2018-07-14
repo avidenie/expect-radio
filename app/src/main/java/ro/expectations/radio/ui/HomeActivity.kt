@@ -31,9 +31,9 @@ class HomeActivity : BaseActivity() {
 
         mediaBrowser.subscribe(RADIO_BROWSER_SERVICE_ROOT, object : MediaBrowserCompat.SubscriptionCallback() {
 
-            override fun onChildrenLoaded(parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>) {
+            override fun onChildrenLoaded(parentId: String, children: List<MediaBrowserCompat.MediaItem>) {
                 super.onChildrenLoaded(parentId, children)
-                adapter.radios = ArrayList(children)
+                adapter.radios = children as ArrayList<MediaBrowserCompat.MediaItem>
             }
         })
     }

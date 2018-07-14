@@ -24,7 +24,8 @@ class RadioProvider(private val firestore: FirebaseFirestore) {
                                 .setMediaId(radio.id)
                                 .setTitle(radio.getString("name"))
                                 .setSubtitle(radio.getString("slogan"))
-                                .setIconUri(Uri.parse(radio.getString("source")))
+                                .setIconUri(Uri.parse(radio.getString("logo")))
+                                .setMediaUri(Uri.parse(radio.getString("source")))
                                 .build()
                         MediaBrowserCompat.MediaItem(description,
                                 MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)

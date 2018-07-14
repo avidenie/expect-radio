@@ -77,14 +77,13 @@ class RadioService : LifecycleMediaBrowserService() {
         return MediaBrowserServiceCompat.BrowserRoot(RADIO_BROWSER_SERVICE_ROOT, null)
     }
 
-    override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {
+    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
         when (RADIO_BROWSER_SERVICE_EMPTY_ROOT) {
             parentId -> result.sendResult(arrayListOf())
             else -> {
                 if (radioResource?.status == Resource.Status.SUCCESS) {
-                    val mediaItems = ArrayList<MediaBrowserCompat.MediaItem>()
                     if (radioResource?.data != null) {
-                        result.sendResult(mediaItems)
+                        result.sendResult(radioResource?.data)
                     } else {
                         result.sendResult(arrayListOf())
                     }
