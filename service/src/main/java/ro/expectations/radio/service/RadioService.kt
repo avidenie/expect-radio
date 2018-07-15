@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.media.AudioAttributesCompat
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -51,11 +52,19 @@ class RadioService : LifecycleMediaBrowserService() {
 
     private var radioResource : Resource<List<MediaBrowserCompat.MediaItem>>? = null
 
+    private val audioAttributes = AudioAttributesCompat.Builder()
+            .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+            .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+            .build()
+
     private val exoPlayer: ExoPlayer by lazy {
-        ExoPlayerFactory.newSimpleInstance(
-                DefaultRenderersFactory(this),
-                DefaultTrackSelector(),
-                DefaultLoadControl())
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        AudioFocusAwarePlayer(audioAttributes,
+                audioManager,
+                ExoPlayerFactory.newSimpleInstance(
+                        DefaultRenderersFactory(this),
+                        DefaultTrackSelector(),
+                        DefaultLoadControl()))
     }
 
     override fun onCreate() {
