@@ -5,16 +5,18 @@ import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.util.Util
 import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.model.Resource
 
-
-private const val TAG = "PlaybackPreparer"
 
 class PlaybackPreparer(
         var radioResource: Resource<List<MediaBrowserCompat.MediaItem>>?,
@@ -43,9 +45,23 @@ class PlaybackPreparer(
             return
         }
 
-        val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(itemToPlay.description.mediaUri)
-        exoPlayer.prepare(mediaSource)
+        val mediaUri = itemToPlay.description.mediaUri
+        if (mediaUri == null) {
+
+        }
+
+        exoPlayer.prepare(buildMediaSource(mediaUri!!, dataSourceFactory))
+    }
+
+    private fun buildMediaSource(uri: Uri, dataSourceFactory: DataSource.Factory): MediaSource {
+        val type = Util.inferContentType(uri)
+        return when (type) {
+            C.TYPE_HLS -> HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+            C.TYPE_OTHER -> ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+            else -> {
+                throw IllegalStateException("Unsupported media URI type: $type")
+            }
+        }
     }
 
     override fun onPrepareFromSearch(query: String?, extras: Bundle?) = Unit
@@ -56,3 +72,6 @@ class PlaybackPreparer(
 
     override fun onCommand(player: Player?, command: String?, extras: Bundle?, cb: ResultReceiver?) = Unit
 }
+
+private const val TAG = "PlaybackPreparer"
+
