@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProvider
 import android.support.v4.media.MediaBrowserCompat
 import ro.expectations.radio.MediaSessionConnection
 import ro.expectations.radio.common.Logger
-import ro.expectations.radio.service.extensions.id
 import ro.expectations.radio.service.extensions.isPlayEnabled
 import ro.expectations.radio.service.extensions.isPlaying
 import ro.expectations.radio.service.extensions.isPrepared
@@ -35,7 +34,7 @@ class HomeActivityViewModel(private val mediaSessionConnection: MediaSessionConn
         val transportControls = mediaSessionConnection.transportControls
 
         val isPrepared = mediaSessionConnection.playbackState.value?.isPrepared ?: false
-        if (isPrepared && mediaItem.mediaId == nowPlaying?.id) {
+        if (isPrepared && mediaItem.mediaId == nowPlaying?.description?.mediaId) {
             mediaSessionConnection.playbackState.value?.let { playbackState ->
                 when {
                     playbackState.isPlaying -> transportControls.pause()

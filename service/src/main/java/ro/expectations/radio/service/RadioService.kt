@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.media.AudioAttributesCompat
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -46,11 +47,12 @@ class RadioService : LifecycleMediaBrowserService() {
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
     private lateinit var playbackPreparer: PlaybackPreparer
+    private lateinit var queueNavigator: QueueNavigator
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
     private var isForegroundService = false
 
-    private var radioResource : Resource<List<MediaBrowserCompat.MediaItem>>? = null
+    private var radioResource : Resource<List<MediaMetadataCompat>>? = null
 
     private val audioAttributes = AudioAttributesCompat.Builder()
             .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
@@ -93,7 +95,10 @@ class RadioService : LifecycleMediaBrowserService() {
             else -> {
                 if (radioResource?.status == Resource.Status.SUCCESS) {
                     if (radioResource?.data != null) {
-                        result.sendResult(radioResource?.data)
+                        val mediaItems = (radioResource?.data as List<MediaMetadataCompat>).map {
+                            MediaBrowserCompat.MediaItem(it.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+                        }
+                        result.sendResult(mediaItems)
                     } else {
                         result.sendResult(arrayListOf())
                     }
@@ -123,13 +128,10 @@ class RadioService : LifecycleMediaBrowserService() {
     }
 
     private fun onAuthenticated() {
-        Logger.e(TAG, "onAuthenticated")
         radioProvider.radios.observe(this, Observer { resource ->
-            Logger.e(TAG, "")
             radioResource = resource
             playbackPreparer.radioResource = radioResource
             notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
-            enforceQueue()
         })
     }
 
@@ -171,26 +173,12 @@ class RadioService : LifecycleMediaBrowserService() {
                     radioResource,
                     exoPlayer,
                     dataSourceFactory)
-
             it.setPlayer(exoPlayer, playbackPreparer)
+
+            // Set up queue navigator
+            queueNavigator = QueueNavigator(mediaSession)
+            it.setQueueNavigator(queueNavigator)
         }
-    }
-
-    private fun enforceQueue() {
-
-        val queue = mutableListOf<MediaSessionCompat.QueueItem>()
-        if (radioResource?.status == Resource.Status.SUCCESS) {
-            val resourceData = radioResource?.data
-            if (resourceData != null) {
-                var index = 0L
-                for (radio in resourceData) {
-                    val queueItem = MediaSessionCompat.QueueItem(radio.description, index++)
-                    queue.add(queueItem)
-                }
-            }
-        }
-
-        mediaSession.setQueue(queue)
     }
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
@@ -209,8 +197,11 @@ class RadioService : LifecycleMediaBrowserService() {
                             notificationHelper.createNotification(mediaSession.sessionToken))
                     isForegroundService = true
                 }
-                PlaybackStateCompat.STATE_NONE -> {
+                PlaybackStateCompat.STATE_NONE,
+                PlaybackStateCompat.STATE_ERROR,
+                PlaybackStateCompat.STATE_STOPPED -> {
                     becomingNoisyReceiver.unregister()
+
                     if (isForegroundService) {
                         stopForeground(true)
                         isForegroundService = false
