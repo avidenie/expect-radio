@@ -1,4 +1,4 @@
-package ro.expectations.radio.service
+package ro.expectations.radio.service.mediasession
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,6 +11,7 @@ import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import ro.expectations.radio.service.R
 import ro.expectations.radio.service.extensions.isPlayEnabled
 import ro.expectations.radio.service.extensions.isPlaying
 import ro.expectations.radio.service.extensions.isSkipToNextEnabled

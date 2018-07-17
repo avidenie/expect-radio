@@ -1,4 +1,4 @@
-package ro.expectations.radio.service
+package ro.expectations.radio.service.mediasession
 
 import android.net.Uri
 import android.os.Bundle

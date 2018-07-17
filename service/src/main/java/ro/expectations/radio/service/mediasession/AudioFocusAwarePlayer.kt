@@ -1,4 +1,4 @@
-package ro.expectations.radio.service
+package ro.expectations.radio.service.mediasession
 
 import android.annotation.TargetApi
 import android.media.AudioAttributes

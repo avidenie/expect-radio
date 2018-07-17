@@ -1,4 +1,4 @@
-package ro.expectations.radio.service
+package ro.expectations.radio.service.mediasession
 
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat

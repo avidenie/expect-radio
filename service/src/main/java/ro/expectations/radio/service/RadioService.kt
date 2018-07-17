@@ -28,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.extensions.stateName
+import ro.expectations.radio.service.mediasession.*
 import ro.expectations.radio.service.model.RadioProvider
 import ro.expectations.radio.service.model.Resource
 
@@ -156,7 +157,7 @@ class RadioService : LifecycleMediaBrowserService() {
                 BecomingNoisyReceiver(this, mediaSession.sessionToken)
 
         // Set up notifications.
-        notificationHelper = NotificationHelper (this)
+        notificationHelper = NotificationHelper(this)
         notificationManager = NotificationManagerCompat.from(this)
 
         // Register the media session callback
