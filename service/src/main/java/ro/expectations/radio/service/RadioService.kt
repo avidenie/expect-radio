@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.app.NotificationManagerCompat
@@ -16,6 +17,13 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.facebook.common.executors.UiThreadImmediateExecutorService
+import com.facebook.common.references.CloseableReference
+import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
+import com.facebook.imagepipeline.image.CloseableImage
+import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
@@ -189,13 +197,29 @@ class RadioService : LifecycleMediaBrowserService() {
 
             Logger.e(TAG, "RadioService::onPlaybackStateChanged => ${state.stateName}")
 
+            val description = mediaSession.controller.metadata.description
+
+            val imageRequest = ImageRequest.fromUri(description.iconUri)
+            val imagePipeline = Fresco.getImagePipeline()
+            val dataSource = imagePipeline.fetchDecodedImage(imageRequest, null)
+            dataSource.subscribe(object:BaseBitmapDataSubscriber() {
+                    override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>?) {
+                        processUpdatedState(updatedState, null)
+                    }
+                    override fun onNewResultImpl(bitmap: Bitmap?) {
+                        processUpdatedState(updatedState, bitmap)
+                    }
+                }, UiThreadImmediateExecutorService.getInstance())
+        }
+
+        private fun processUpdatedState(updatedState: Int, bitmap: Bitmap?) {
             when (updatedState) {
                 PlaybackStateCompat.STATE_BUFFERING,
                 PlaybackStateCompat.STATE_PLAYING -> {
                     becomingNoisyReceiver.register()
 
                     startForeground(NOW_PLAYING_NOTIFICATION_ID,
-                            notificationHelper.createNotification(mediaSession.sessionToken))
+                            notificationHelper.createNotification(mediaSession.sessionToken, bitmap))
                     isForegroundService = true
                 }
                 PlaybackStateCompat.STATE_NONE,
@@ -214,7 +238,7 @@ class RadioService : LifecycleMediaBrowserService() {
                     if (isForegroundService) {
                         stopForeground(false)
                         notificationManager.notify(NOW_PLAYING_NOTIFICATION_ID,
-                                notificationHelper.createNotification(mediaSession.sessionToken))
+                                notificationHelper.createNotification(mediaSession.sessionToken, bitmap))
                         isForegroundService = false
                     }
                 }

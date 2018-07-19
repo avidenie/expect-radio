@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
@@ -55,7 +56,7 @@ class NotificationHelper(private val context: Context) {
                     context,
                     PlaybackStateCompat.ACTION_STOP)
 
-    fun createNotification(sessionToken: MediaSessionCompat.Token): Notification {
+    fun createNotification(sessionToken: MediaSessionCompat.Token, bitmap: Bitmap?): Notification {
 
         if (shouldCreateNowPlayingChannel()) {
             createNowPlayingChannel()
@@ -92,7 +93,7 @@ class NotificationHelper(private val context: Context) {
                 .setContentText(description.subtitle)
                 .setContentTitle(description.title)
                 .setDeleteIntent(stopPendingIntent)
-                .setLargeIcon(description.iconBitmap)
+                .setLargeIcon(bitmap)
                 .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setStyle(mediaStyle)
