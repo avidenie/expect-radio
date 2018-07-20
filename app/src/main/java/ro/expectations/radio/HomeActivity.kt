@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_home.*
 import ro.expectations.radio.utils.InjectorUtils
 import ro.expectations.radio.viewmodels.HomeActivityViewModel
 
@@ -14,9 +15,11 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var viewModel: HomeActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_home)
+        setSupportActionBar(toolbar)
 
         volumeControlStream = AudioManager.STREAM_MUSIC
 
