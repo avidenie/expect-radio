@@ -23,7 +23,7 @@ buildscript {
     // Firebase
     ext.firebaseCoreVersion = '16.0.1'
     ext.firebaseAuthVersion = '16.0.2'
-    ext.firebaseFirestoreVersion = '17.0.2'
+    ext.firebaseFirestoreVersion = '17.0.4'
 
     repositories {
         google()
