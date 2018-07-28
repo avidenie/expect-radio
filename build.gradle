@@ -19,6 +19,8 @@ buildscript {
 
     // Android Architecture Components
     ext.archLifecycleVersion = '1.1.1'
+    ext.roomVersion = '1.1.1'
+    ext.pagingVersion = '1.0.1'
 
     // Firebase
     ext.firebaseCoreVersion = '16.0.1'

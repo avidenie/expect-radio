@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
 
@@ -34,10 +35,15 @@ dependencies {
 
     // Android support libraries
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
 
     // Architecture components
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+    implementation "android.arch.lifecycle:livedata-core:$archLifecycleVersion"
+    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
+    implementation "android.arch.paging:runtime:$rootProject.pagingVersion"
 
     // Firebase
     implementation "com.google.firebase:firebase-core:$rootProject.firebaseCoreVersion"

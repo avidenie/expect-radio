@@ -1,7 +1,10 @@
 package ro.expectations.radio.service
 
 import android.app.PendingIntent
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.Transformations.map
+import android.arch.lifecycle.Transformations.switchMap
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,10 +38,13 @@ import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import ro.expectations.radio.common.Logger
+import ro.expectations.radio.service.db.RadioDatabase
 import ro.expectations.radio.service.extensions.stateName
 import ro.expectations.radio.service.mediasession.*
 import ro.expectations.radio.service.model.RadioProvider
 import ro.expectations.radio.service.model.Resource
+import ro.expectations.radio.service.repository.RadioRepository
+import java.util.concurrent.Executors
 
 
 private const val TAG = "RadioService"
