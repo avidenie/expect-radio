@@ -1,22 +1,18 @@
 package ro.expectations.radio.service
 
 import android.app.PendingIntent
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.Transformations.map
-import android.arch.lifecycle.Transformations.switchMap
+import android.arch.paging.PagedList
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NotificationManagerCompat
-import android.support.v4.media.AudioAttributesCompat
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaBrowserServiceCompat
-import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.*
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -36,15 +32,10 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import ro.expectations.radio.common.Logger
-import ro.expectations.radio.service.db.RadioDatabase
+import ro.expectations.radio.service.db.RadioEntity
 import ro.expectations.radio.service.extensions.stateName
 import ro.expectations.radio.service.mediasession.*
-import ro.expectations.radio.service.model.RadioProvider
-import ro.expectations.radio.service.model.Resource
-import ro.expectations.radio.service.repository.RadioRepository
-import java.util.concurrent.Executors
 
 
 private const val TAG = "RadioService"
@@ -56,7 +47,6 @@ const val RADIO_BROWSER_SERVICE_ROOT = "__ROOT__"
 class RadioService : LifecycleMediaBrowserService() {
 
     private lateinit var packageValidator: PackageValidator
-    private lateinit var radioProvider: RadioProvider
     private lateinit var mediaSession : MediaSessionCompat
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationHelper: NotificationHelper
@@ -66,8 +56,6 @@ class RadioService : LifecycleMediaBrowserService() {
     private lateinit var mediaSessionConnector: MediaSessionConnector
 
     private var isForegroundService = false
-
-    private var radioResource : Resource<List<MediaMetadataCompat>>? = null
 
     private val audioAttributes = AudioAttributesCompat.Builder()
             .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
@@ -87,7 +75,7 @@ class RadioService : LifecycleMediaBrowserService() {
     override fun onCreate() {
         super.onCreate()
         packageValidator = PackageValidator(this)
-        initMediaLibrary()
+        enforceAuth()
         initMediaSession()
     }
 
@@ -108,46 +96,48 @@ class RadioService : LifecycleMediaBrowserService() {
         when (RADIO_BROWSER_SERVICE_EMPTY_ROOT) {
             parentId -> result.sendResult(arrayListOf())
             else -> {
-                if (radioResource?.status == Resource.Status.SUCCESS) {
-                    if (radioResource?.data != null) {
-                        val mediaItems = (radioResource?.data as List<MediaMetadataCompat>).map {
-                            MediaBrowserCompat.MediaItem(it.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+                result.detach()
+
+                val model = ServiceLocator.instance(this).getModel()
+                model.radios.observe(this, object: Observer<PagedList<RadioEntity>> {
+                    override fun onChanged(radios: PagedList<RadioEntity>?) {
+                        if (radios != null) {
+                            if (radios.isNotEmpty()) {
+                                val mediaItems = radios.map {
+                                    val description = MediaDescriptionCompat.Builder()
+                                            .setMediaId(it.id)
+                                            .setTitle(it.name)
+                                            .setSubtitle(it.slogan)
+                                            .setIconUri(Uri.parse(it.logo))
+                                            .setMediaUri(Uri.parse(it.source))
+                                            .build()
+                                    MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+                                }
+                                result.sendResult(mediaItems)
+                            } else {
+                                result.sendResult(arrayListOf())
+                            }
+                        } else {
+                            result.sendResult(arrayListOf())
                         }
-                        result.sendResult(mediaItems)
-                    } else {
-                        result.sendResult(arrayListOf())
+                        model.radios.removeObserver(this)
                     }
-                } else {
-                    result.sendResult(arrayListOf())
-                }
+                })
             }
         }
     }
 
-    private fun initMediaLibrary() {
-
-        radioProvider = RadioProvider(FirebaseFirestore.getInstance())
-
+    private fun enforceAuth() {
         val firebaseAuth = FirebaseAuth.getInstance()
         if (firebaseAuth.currentUser == null) {
             firebaseAuth.signInAnonymously().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onAuthenticated()
+                    notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
                 } else {
                     Logger.e(TAG, task.exception as Throwable, "Firebase signInAnonymously failure")
                 }
             }
-        } else {
-            onAuthenticated()
         }
-    }
-
-    private fun onAuthenticated() {
-        radioProvider.radios.observe(this, Observer { resource ->
-            radioResource = resource
-            playbackPreparer.radioResource = radioResource
-            notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
-        })
     }
 
     private fun initMediaSession() {
@@ -185,7 +175,8 @@ class RadioService : LifecycleMediaBrowserService() {
 
             // Create the PlaybackPreparer of the media session connector.
             playbackPreparer = PlaybackPreparer(
-                    radioResource,
+                    this,
+                    ServiceLocator.instance(this).getRepository(),
                     exoPlayer,
                     dataSourceFactory)
             it.setPlayer(exoPlayer, playbackPreparer)

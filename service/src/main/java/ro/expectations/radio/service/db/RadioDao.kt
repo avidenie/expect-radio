@@ -16,6 +16,9 @@ interface RadioDao {
     @Query("SELECT * FROM radios ORDER BY name")
     fun findAll() : DataSource.Factory<Int, RadioEntity>
 
+    @Query("SELECT * FROM radios WHERE id = :id")
+    fun findById(id: String) : RadioEntity?
+
     @Query("DELETE FROM radios")
     fun deleteAll()
 

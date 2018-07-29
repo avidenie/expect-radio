@@ -1,5 +1,8 @@
 package ro.expectations.radio.service.mediasession
 
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.Observer
+import android.arch.paging.PagedList
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
@@ -16,11 +19,13 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.util.Util
 import ro.expectations.radio.common.Logger
-import ro.expectations.radio.service.model.Resource
+import ro.expectations.radio.service.db.RadioEntity
+import ro.expectations.radio.service.repository.RadioRepository
 
 
 class PlaybackPreparer(
-        var radioResource: Resource<List<MediaMetadataCompat>>?,
+        private val lifecycleOwner: LifecycleOwner,
+        private val repository: RadioRepository,
         private val exoPlayer: ExoPlayer,
         private val dataSourceFactory: DataSource.Factory
 ) : MediaSessionConnector.PlaybackPreparer {
@@ -31,32 +36,53 @@ class PlaybackPreparer(
 
     override fun onPrepare() = Unit
 
-    override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
+    override fun onPrepareFromMediaId(mediaId: String, extras: Bundle?) {
 
-        if (radioResource?.status == Resource.Status.SUCCESS) {
+        val itemToPlayLive = repository.radioById(mediaId)
+        itemToPlayLive.observe(lifecycleOwner, object: Observer<RadioEntity?> {
+            override fun onChanged(itemToPlay: RadioEntity?) {
 
-            val itemToPlay = radioResource?.data?.find {
-                it.description.mediaId == mediaId
-            }
+                if (itemToPlay == null) {
+                    Logger.w(TAG, "Content not found: mediaID = $mediaId")
+                } else {
 
-            if (itemToPlay == null) {
-                Logger.w(TAG, "Content not found: mediaID = $mediaId")
-            } else {
+                    val radioList = repository.radios(30).pagedList
 
-                val metadataList = radioResource?.data
-                if (metadataList != null) {
+                    radioList.observe(lifecycleOwner, object: Observer<PagedList<RadioEntity>> {
+                        override fun onChanged(radios: PagedList<RadioEntity>?) {
+                            if (radios != null) {
+                                if (radios.isNotEmpty()) {
 
-                    val mediaSource = ConcatenatingMediaSource()
-                    metadataList.forEach {
-                        mediaSource.addMediaSource(buildMediaSource(it, dataSourceFactory))
-                    }
-                    exoPlayer.prepare(mediaSource)
+                                    val mediaSource = ConcatenatingMediaSource()
+                                    for(radio in radios) {
 
-                    val initialWindowIndex = metadataList.indexOf(itemToPlay)
-                    exoPlayer.seekTo(initialWindowIndex, 0)
+                                        val metadata = MediaMetadataCompat.Builder().apply {
+                                            putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, radio.id)
+                                            putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, radio.name)
+                                            putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, radio.slogan)
+                                            putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, radio.logo)
+                                            putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, radio.source)
+                                        }.build()
+
+                                        mediaSource.addMediaSource(buildMediaSource(metadata, dataSourceFactory))
+                                    }
+                                    exoPlayer.prepare(mediaSource)
+
+                                    val initialWindowIndex = radios.indexOf(itemToPlay)
+                                    exoPlayer.seekTo(initialWindowIndex, 0)
+
+                                    radioList.removeObserver(this)
+                                }
+                            }
+                        }
+                    })
                 }
+
+                itemToPlayLive.removeObserver(this)
             }
-        }
+        })
+
+
     }
 
     private fun buildMediaSource(metadata: MediaMetadataCompat, dataSourceFactory: DataSource.Factory): MediaSource {

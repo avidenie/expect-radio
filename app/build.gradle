@@ -54,6 +54,7 @@ dependencies {
 
     // Architecture components
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+    implementation "android.arch.paging:runtime:$rootProject.pagingVersion"
 
     // Firebase
     implementation "com.google.firebase:firebase-core:$rootProject.firebaseCoreVersion"

@@ -22,6 +22,14 @@ class RadioRepository(
         private const val DEFAULT_NETWORK_PAGE_SIZE = 10
     }
 
+    fun radioById(id: String): LiveData<RadioEntity?> {
+        val radio = MutableLiveData<RadioEntity>()
+        ioExecutor.execute {
+            radio.postValue(db.radios().findById(id))
+        }
+        return radio
+    }
+
     fun radios(pageSize: Int): Listing<RadioEntity> {
 
         // Create a boundary callback which will observe when the user reaches to the edges of
