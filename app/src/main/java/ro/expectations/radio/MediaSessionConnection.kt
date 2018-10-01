@@ -3,6 +3,7 @@ package ro.expectations.radio
 import android.arch.lifecycle.MutableLiveData
 import android.content.ComponentName
 import android.content.Context
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -33,8 +34,8 @@ class MediaSessionConnection(context: Context, serviceComponent: ComponentName) 
             .apply { connect() }
     private lateinit var mediaController: MediaControllerCompat
 
-    fun subscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {
-        mediaBrowser.subscribe(parentId, callback)
+    fun subscribe(parentId: String, options: Bundle, callback: MediaBrowserCompat.SubscriptionCallback) {
+        mediaBrowser.subscribe(parentId, options, callback)
     }
 
     fun unsubscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {

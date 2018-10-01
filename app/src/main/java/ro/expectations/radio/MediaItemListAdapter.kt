@@ -1,5 +1,6 @@
 package ro.expectations.radio
 
+import android.arch.paging.PagedListAdapter
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.widget.RecyclerView
@@ -12,7 +13,7 @@ import kotlinx.android.synthetic.main.mediaitem_list_item.view.*
 
 
 class MediaItemListAdapter(private val itemClickedListener: (MediaBrowserCompat.MediaItem) -> Unit
-) : ListAdapter<MediaBrowserCompat.MediaItem, MediaItemListAdapter.MediaViewHolder>(MediaItemDiffCallback()) {
+) : PagedListAdapter<MediaBrowserCompat.MediaItem, MediaItemListAdapter.MediaViewHolder>(MediaItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.mediaitem_list_item, parent, false)
@@ -23,9 +24,9 @@ class MediaItemListAdapter(private val itemClickedListener: (MediaBrowserCompat.
         val mediaItem = getItem(position)
 
         holder.item = mediaItem
-        holder.nameView.text = mediaItem.description.title
-        holder.descriptionView.text = mediaItem.description.subtitle
-        holder.logoView.setImageURI(mediaItem.description.iconUri, null)
+        holder.nameView.text = mediaItem?.description?.title
+        holder.descriptionView.text = mediaItem?.description?.subtitle
+        holder.logoView.setImageURI(mediaItem?.description?.iconUri, null)
     }
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {

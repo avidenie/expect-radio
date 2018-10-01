@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.util.Util
 import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.db.RadioEntity
+import ro.expectations.radio.service.model.RadioModel
 import ro.expectations.radio.service.repository.RadioRepository
 
 
@@ -38,7 +39,7 @@ class PlaybackPreparer(
 
     override fun onPrepareFromMediaId(mediaId: String, extras: Bundle?) {
 
-        val itemToPlayLive = repository.radioById(mediaId)
+        val itemToPlayLive = repository.findById(mediaId)
         itemToPlayLive.observe(lifecycleOwner, object: Observer<RadioEntity?> {
             override fun onChanged(itemToPlay: RadioEntity?) {
 
@@ -46,7 +47,7 @@ class PlaybackPreparer(
                     Logger.w(TAG, "Content not found: mediaID = $mediaId")
                 } else {
 
-                    val radioList = repository.radios(30).pagedList
+                    val radioList = repository.radios(150).pagedList
 
                     radioList.observe(lifecycleOwner, object: Observer<PagedList<RadioEntity>> {
                         override fun onChanged(radios: PagedList<RadioEntity>?) {

@@ -2,8 +2,10 @@ package ro.expectations.radio.service
 
 import android.app.Application
 import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import ro.expectations.radio.service.db.RadioDatabase
+import ro.expectations.radio.service.model.AuthModel
 import ro.expectations.radio.service.model.RadioModel
 import ro.expectations.radio.service.repository.RadioRepository
 import java.util.concurrent.Executor
@@ -25,7 +27,9 @@ interface ServiceLocator {
         }
     }
 
-    fun getModel(): RadioModel
+    fun getAuthModel(): AuthModel
+
+    fun getRadioModel(): RadioModel
 
     fun getRepository(): RadioRepository
 
@@ -40,7 +44,9 @@ class DefaultServiceLocator(val app: Application) : ServiceLocator {
 
     private val networkIOExecutor = Executors.newFixedThreadPool(5)
 
-    override fun getModel(): RadioModel = RadioModel(getRepository())
+    override fun getAuthModel() = AuthModel(FirebaseAuth.getInstance())
+
+    override fun getRadioModel(): RadioModel = RadioModel(getRepository())
 
     override fun getRepository(): RadioRepository = RadioRepository(
             db = RadioDatabase.create(app),

@@ -12,7 +12,10 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NotificationManagerCompat
-import android.support.v4.media.*
+import android.support.v4.media.AudioAttributesCompat
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaBrowserServiceCompat
+import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -32,13 +35,15 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.db.RadioEntity
 import ro.expectations.radio.service.extensions.stateName
 import ro.expectations.radio.service.mediasession.*
+import ro.expectations.radio.service.model.AuthModel
+import ro.expectations.radio.service.model.RadioModel
 
 
-private const val TAG = "RadioService"
 private const val EXPECT_RADIO_USER_AGENT = "Expect.Radio"
 
 private const val RADIO_BROWSER_SERVICE_EMPTY_ROOT = "__EMPTY_ROOT__"
@@ -54,6 +59,9 @@ class RadioService : LifecycleMediaBrowserService() {
     private lateinit var playbackPreparer: PlaybackPreparer
     private lateinit var queueNavigator: QueueNavigator
     private lateinit var mediaSessionConnector: MediaSessionConnector
+
+    private lateinit var authModel: AuthModel
+    private lateinit var radioModel: RadioModel
 
     private var isForegroundService = false
 
@@ -74,9 +82,28 @@ class RadioService : LifecycleMediaBrowserService() {
 
     override fun onCreate() {
         super.onCreate()
+
+        val serviceLocator = ServiceLocator.instance(this)
+
+        authModel = serviceLocator.getAuthModel()
+        authModel.firebaseAuthLiveData.observe(this, Observer { currentUser ->
+            Logger.e(TAG, "Got Firebase auth user $currentUser")
+            if (currentUser == null) {
+                FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Logger.e(TAG,"Firebase signed anonymously")
+                    } else {
+                        Logger.e(TAG, task.exception as Throwable, "Firebase signInAnonymously failure")
+                    }
+                }
+            }
+        })
+
         packageValidator = PackageValidator(this)
-        enforceAuth()
+
         initMediaSession()
+
+        radioModel = serviceLocator.getRadioModel()
     }
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
@@ -93,49 +120,107 @@ class RadioService : LifecycleMediaBrowserService() {
     }
 
     override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
+        onLoadChildren(parentId, result, Bundle().apply {
+            putInt(MediaBrowserCompat.EXTRA_PAGE, 0)
+            putInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, 15)
+        })
+    }
+
+    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>, options: Bundle) {
+
+        val page = options.getInt(MediaBrowserCompat.EXTRA_PAGE)
+        val pageSize = options.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE)
+        Logger.e(TAG, "onLoadChildren: page=$page, pageSize: $pageSize, parentId: $parentId")
         when (RADIO_BROWSER_SERVICE_EMPTY_ROOT) {
             parentId -> result.sendResult(arrayListOf())
             else -> {
+
                 result.detach()
 
-                val model = ServiceLocator.instance(this).getModel()
-                model.radios.observe(this, object: Observer<PagedList<RadioEntity>> {
-                    override fun onChanged(radios: PagedList<RadioEntity>?) {
-                        if (radios != null) {
-                            if (radios.isNotEmpty()) {
-                                val mediaItems = radios.map {
-                                    val description = MediaDescriptionCompat.Builder()
-                                            .setMediaId(it.id)
-                                            .setTitle(it.name)
-                                            .setSubtitle(it.slogan)
-                                            .setIconUri(Uri.parse(it.logo))
-                                            .setMediaUri(Uri.parse(it.source))
-                                            .build()
-                                    MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
-                                }
-                                result.sendResult(mediaItems)
-                            } else {
-                                result.sendResult(arrayListOf())
-                            }
-                        } else {
-                            result.sendResult(arrayListOf())
+                authModel.firebaseAuthLiveData.observe(this, object: Observer<FirebaseUser> {
+                    override fun onChanged(currentUser: FirebaseUser?) {
+
+                        if (currentUser == null) {
+                            return
                         }
-                        model.radios.removeObserver(this)
+
+                        val from = page * pageSize
+                        val to = from + pageSize
+
+                        radioModel.radios.observe(this@RadioService, object : Observer<PagedList<RadioEntity>> {
+                            override fun onChanged(radios: PagedList<RadioEntity>?) {
+
+                                val self = this
+
+                                if (radios == null || radios.size == 0) {
+                                    return
+                                }
+
+                                val weakCallback = object:PagedList.Callback() {
+                                    override fun onChanged(position: Int, count: Int) {
+                                        // nothing to do
+                                    }
+
+                                    override fun onInserted(position: Int, count: Int) {
+                                        if (from < radios.positionOffset || from >= radios.positionOffset + radios.size) {
+                                            radios.loadAround(from)
+                                        } else {
+                                            val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
+                                            for (idx in from - radios.positionOffset until minOf(to - radios.positionOffset, radios.size)) {
+                                                val radio = radios[idx]
+                                                if (radio != null) {
+                                                    val description = MediaDescriptionCompat.Builder()
+                                                            .setMediaId(radio.id)
+                                                            .setTitle(radio.name)
+                                                            .setSubtitle(radio.slogan)
+                                                            .setIconUri(Uri.parse(radio.logo))
+                                                            .setMediaUri(Uri.parse(radio.source))
+                                                            .build()
+                                                    mediaItems.add(MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+                                                }
+                                            }
+
+                                            result.sendResult(mediaItems)
+                                            radioModel.radios.removeObserver(self)
+                                            radios.removeWeakCallback(this)
+                                        }
+                                    }
+
+                                    override fun onRemoved(position: Int, count: Int) {
+                                        // nothing to do
+                                    }
+                                }
+
+                                radios.addWeakCallback(null, weakCallback)
+
+                                if (from < radios.positionOffset || from >= radios.positionOffset + radios.size) {
+                                    radios.loadAround(from)
+                                } else {
+                                    val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
+                                    for (idx in from - radios.positionOffset until minOf(to - radios.positionOffset, radios.size)) {
+                                        val radio = radios[idx]
+                                        if (radio != null) {
+                                            val description = MediaDescriptionCompat.Builder()
+                                                    .setMediaId(radio.id)
+                                                    .setTitle(radio.name)
+                                                    .setSubtitle(radio.slogan)
+                                                    .setIconUri(Uri.parse(radio.logo))
+                                                    .setMediaUri(Uri.parse(radio.source))
+                                                    .build()
+                                            mediaItems.add(MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE))
+                                        }
+                                    }
+
+                                    result.sendResult(mediaItems)
+                                    radioModel.radios.removeObserver(this)
+                                    radios.removeWeakCallback(weakCallback)
+                                }
+                            }
+                        })
+
+                        authModel.firebaseAuthLiveData.removeObserver(this)
                     }
                 })
-            }
-        }
-    }
-
-    private fun enforceAuth() {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        if (firebaseAuth.currentUser == null) {
-            firebaseAuth.signInAnonymously().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    notifyChildrenChanged(RADIO_BROWSER_SERVICE_ROOT)
-                } else {
-                    Logger.e(TAG, task.exception as Throwable, "Firebase signInAnonymously failure")
-                }
             }
         }
     }
@@ -273,3 +358,6 @@ private class BecomingNoisyReceiver(private val context: Context,
         }
     }
 }
+
+private const val TAG = "RadioService"
+

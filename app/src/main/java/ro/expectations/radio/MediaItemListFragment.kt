@@ -2,6 +2,7 @@ package ro.expectations.radio
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.arch.paging.PagedList
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.media.MediaBrowserCompat
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_mediaitem_list.*
+import ro.expectations.radio.common.Logger
 import ro.expectations.radio.utils.InjectorUtils
 import ro.expectations.radio.viewmodels.HomeActivityViewModel
 import ro.expectations.radio.viewmodels.MediaItemFragmentViewModel
@@ -55,10 +57,12 @@ class MediaItemListFragment : Fragment() {
                 .of(this, InjectorUtils.provideMediaItemFragmentViewModel(context, parentId))
                 .get(MediaItemFragmentViewModel::class.java)
 
-        mediaItemFragmentViewModel.mediaItems.observe(this,
-                Observer<List<MediaBrowserCompat.MediaItem>> { list ->
+        mediaItemFragmentViewModel.getMediaItems().observe(
+                this,
+                Observer<PagedList<MediaBrowserCompat.MediaItem>> { list ->
                     mediaListAdapter.submitList(list)
-                })
+                }
+        )
 
         mediaItemList.layoutManager = LinearLayoutManager(mediaItemList.context)
         mediaItemList.adapter = mediaListAdapter

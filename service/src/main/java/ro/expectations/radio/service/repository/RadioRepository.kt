@@ -7,6 +7,7 @@ import android.arch.paging.LivePagedListBuilder
 import android.arch.paging.PagedList
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import ro.expectations.radio.common.Logger
 import ro.expectations.radio.service.db.RadioDatabase
 import ro.expectations.radio.service.db.RadioEntity
 import java.util.concurrent.Executor
@@ -19,10 +20,10 @@ class RadioRepository(
         private val networkPageSize: Int = DEFAULT_NETWORK_PAGE_SIZE) {
 
     companion object {
-        private const val DEFAULT_NETWORK_PAGE_SIZE = 10
+        private const val DEFAULT_NETWORK_PAGE_SIZE = 30
     }
 
-    fun radioById(id: String): LiveData<RadioEntity?> {
+    fun findById(id: String): LiveData<RadioEntity?> {
         val radio = MutableLiveData<RadioEntity>()
         ioExecutor.execute {
             radio.postValue(db.radios().findById(id))
@@ -98,15 +99,22 @@ class RadioRepository(
     }
 
     private fun insertResultIntoDb(documents: List<DocumentSnapshot>) {
+
+        Logger.e(TAG, "insertResultIntoDb --> ${documents.size} documents")
+//        for (doc in documents) {
+//            Logger.e(TAG, " --> ${doc.get("name")} (#${doc.id})")
+//        }
         val radios = documents.map { document ->
             RadioEntity(
                     document.id,
-                    document.data!!["name"].toString(),
-                    document.data!!["slogan"].toString(),
-                    document.data!!["logo"].toString(),
-                    document.data!!["source"].toString()
+                    document.get("name").toString(),
+                    document.get("slogan").toString(),
+                    document.get("logo").toString(),
+                    document.get("source").toString()
             )
         }
         db.radios().insert(radios)
     }
 }
+
+private const val TAG = "RadioRepository"
