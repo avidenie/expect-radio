@@ -32,6 +32,11 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.media:media:$media_version"
 
+    // ExoPlayer
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayer_version"
+    implementation "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
+
     // Logging
     implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"
     implementation "org.slf4j:slf4j-android:$slf4j_version"
