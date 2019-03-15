@@ -2,7 +2,12 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="ro.expectations.radio.media">
 
-    <application>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+            android:networkSecurityConfig="@xml/network_security_config"
+            tools:ignore="UnusedAttribute">
 
         <!-- Declare that the application supports Android Auto. -->
         <meta-data
@@ -22,6 +27,12 @@
                 <action android:name="android.media.browse.MediaBrowserService"/>
             </intent-filter>
         </service>
+
+        <receiver android:name="androidx.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

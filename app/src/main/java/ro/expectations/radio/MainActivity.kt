@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
 
         MediaControllerCompat.getMediaController(this).unregisterCallback(controllerCallback)
+        mediaBrowser.disconnect()
     }
 
     private val connectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
@@ -63,41 +64,30 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 MediaControllerCompat.setMediaController(this@MainActivity, mediaController)
-            }
 
-            // Finish building the UI
-            buildTransportControls()
+                mediaController.registerCallback(controllerCallback)
+
+                mediaController.transportControls.playFromMediaId("xxxxx", null)
+            }
         }
 
         override fun onConnectionSuspended() {
-            // The Service has crashed. Disable transport controls until it automatically reconnects
+            logger.error { "The Service has crashed. Disable transport controls until it automatically reconnects." }
         }
 
         override fun onConnectionFailed() {
-            // The Service has refused our connection
+            logger.error { "The Service has refused our connection" }
         }
     }
 
     private var controllerCallback = object : MediaControllerCompat.Callback() {
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            logger.info { "metadata changed -> ${metadata.toString()}" }
+            // logger.info { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            logger.info { "playback state changed -> ${state.toString()}" }
+            // logger.info { "MediaControllerCallback::onPlaybackStateChanged: ${state?.stateName} -> $state" }
         }
-    }
-
-    fun buildTransportControls() {
-
-        val mediaController = MediaControllerCompat.getMediaController(this@MainActivity)
-
-        // Register a Callback to stay in sync
-        mediaController.registerCallback(controllerCallback)
-
-        // Grab the view for the play/pause button
-        mediaController.transportControls.play()
-
     }
 }

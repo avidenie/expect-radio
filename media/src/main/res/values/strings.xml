@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">Media</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Now Playing</string>
+    <string name="notification_channel_description">Shows what\'s currently playing in Expect Radio</string>
+
+    <!-- Notification actions -->
+    <string name="notification_skip_to_previous">Previous</string>
+    <string name="notification_skip_to_next">Next</string>
+    <string name="notification_play">Play</string>
+    <string name="notification_pause">Pause</string>
+
+    <!-- Notifications -->
+    <string name="notification_connecting_to_media">Connecting to media …</string>
+
 </resources>
