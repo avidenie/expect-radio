@@ -34,8 +34,8 @@ dependencies {
     implementation "androidx.media:media:$media_version"
 
     // ExoPlayer
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
-    implementation "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
+    api project(':exo-library-core')
+    api project(':exo-extension-mediasession')
 
     // Logging
     implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"

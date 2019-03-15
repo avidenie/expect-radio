@@ -20,7 +20,9 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
 import mu.KLogging
 import ro.expectations.radio.media.extensions.stateName
@@ -44,6 +46,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
                 .setUsage(C.USAGE_MEDIA)
                 .build()
             setAudioAttributes(audioAttributes, true)
+            addAnalyticsListener(EventLogger(DefaultTrackSelector()))
         }
     }
 
@@ -77,9 +80,12 @@ class PlaybackService : MediaBrowserServiceCompat() {
         mediaSessionConnector = MediaSessionConnector(mediaSession).also {
 
             // Initialise and set the player
+            it.setPlayer(exoPlayer)
+
+            // Set the playback preparer
             val userAgent = Util.getUserAgent(this, "Expect Radio")
             val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
-            it.setPlayer(exoPlayer, PlaybackPreparer(exoPlayer, dataSourceFactory))
+            it.setPlaybackPreparer(PlaybackPreparer(exoPlayer, dataSourceFactory))
 
             // Set the default queue navigator
             it.setQueueNavigator(QueueNavigator(mediaSession))

@@ -1,1 +1,18 @@
 include ':app', ':media'
+
+// Depend on a local checkout of ExoPlayer
+
+gradle.ext.exoplayerRoot = 'exoplayer'
+gradle.ext.exoplayerModulePrefix = 'exo-'
+
+def rootDir = gradle.ext.exoplayerRoot
+def modulePrefix = ':'
+if (gradle.ext.has('exoplayerModulePrefix')) {
+    modulePrefix += gradle.ext.exoplayerModulePrefix
+}
+
+include modulePrefix + 'library-core'
+include modulePrefix + 'extension-mediasession'
+
+project(modulePrefix + 'library-core').projectDir = new File(rootDir, 'library/core')
+project(modulePrefix + 'extension-mediasession').projectDir = new File(rootDir, 'extensions/mediasession')
