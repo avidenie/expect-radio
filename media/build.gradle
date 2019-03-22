@@ -30,16 +30,14 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Android libraries
-    implementation "androidx.appcompat:appcompat:$appcompat_version"
-    implementation "androidx.media:media:$media_version"
+    implementation "androidx.media:media:$androidx_version"
 
     // ExoPlayer
-    api project(':exo-library-core')
-    api project(':exo-extension-mediasession')
+    implementation project(':exo-library-core')
+    implementation project(':exo-extension-mediasession')
 
     // Logging
     implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"
-    implementation "org.slf4j:slf4j-android:$slf4j_version"
 
     // Testing
     testImplementation "junit:junit:$junit_version"
