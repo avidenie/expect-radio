@@ -3,6 +3,10 @@
 buildscript {
 
     ext {
+        // App versions
+        versionCode = 2
+        versionName = "1.0.0"
+
         // Android SDK versions
         compileSdkVersion = 28
         minSdkVersion = 21
