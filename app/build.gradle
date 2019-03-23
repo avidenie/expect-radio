@@ -7,8 +7,9 @@ android {
 
     defaultConfig {
         applicationId "ro.expectations.radio"
-        versionCode 1
-        versionName "1.0"
+
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
