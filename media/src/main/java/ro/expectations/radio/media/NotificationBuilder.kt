@@ -92,7 +92,7 @@ class NotificationBuilder(private val context: Context) {
         return builder.setContentIntent(controller.sessionActivity)
                 .setContentTitle(description.title)
                 .setContentText(description.subtitle)
-                .setSmallIcon(R.drawable.ic_radio_black_24dp)
+                .setSmallIcon(R.drawable.ic_stat_notify_media)
                 .setLargeIcon(description.iconBitmap)
                 .setOnlyAlertOnce(true)
                 .setStyle(mediaStyle)
