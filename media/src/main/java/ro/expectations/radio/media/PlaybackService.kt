@@ -24,13 +24,17 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import mu.KLogging
 import ro.expectations.radio.media.extensions.stateName
+import ro.expectations.radio.media.library.MediaBrowser
 
 class PlaybackService : MediaBrowserServiceCompat() {
 
     companion object : KLogging()
 
+    private lateinit var mediaBrowser: MediaBrowser
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
@@ -52,6 +56,12 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // initialise the media library
+        mediaBrowser = MediaBrowser(
+            FirebaseAuth.getInstance(),
+            FirebaseFirestore.getInstance()
+        )
 
         // Build a PendingIntent that can be used to launch the UI.
         val sessionIntent = packageManager?.getLaunchIntentForPackage(packageName)
@@ -128,14 +138,14 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
         logger.info { "onGetRoot: $clientPackageName, $clientUid, $rootHints" }
 
-        return MediaBrowserServiceCompat.BrowserRoot("root", null)
+        return mediaBrowser.onGetRoot(clientPackageName, clientUid, rootHints)
     }
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
 
         logger.info { "onLoadChildren: $parentId" }
 
-        result.sendResult(ArrayList())
+        mediaBrowser.onLoadChildren(parentId, result)
     }
 
     /**
