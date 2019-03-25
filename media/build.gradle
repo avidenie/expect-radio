@@ -36,6 +36,10 @@ dependencies {
     implementation project(':exo-library-core')
     implementation project(':exo-extension-mediasession')
 
+    // Firebase
+    implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
+    implementation "com.google.firebase:firebase-firestore:$firebase_firestore_version"
+
     // Logging
     implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"
 
