@@ -8,12 +8,12 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.appcompat.app.AppCompatActivity
-import mu.KLogging
+import mu.KotlinLogging
 import ro.expectations.radio.media.PlaybackService
 
-class MainActivity : AppCompatActivity() {
+private val logger = KotlinLogging.logger {}
 
-    companion object : KLogging()
+class MainActivity : AppCompatActivity() {
 
     private lateinit var mediaBrowser: MediaBrowserCompat
 
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         override fun onConnected() {
             super.onConnected()
 
-            logger.info { "connected to playback service" }
+            logger.debug { "connected to playback service" }
 
             mediaBrowser.sessionToken.also { token ->
 
@@ -83,11 +83,11 @@ class MainActivity : AppCompatActivity() {
     private var controllerCallback = object : MediaControllerCompat.Callback() {
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            // logger.info { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
+            // logger.debug { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            // logger.info { "MediaControllerCallback::onPlaybackStateChanged: ${state?.stateName} -> $state" }
+            // logger.debug { "MediaControllerCallback::onPlaybackStateChanged: ${state?.stateName} -> $state" }
         }
     }
 }

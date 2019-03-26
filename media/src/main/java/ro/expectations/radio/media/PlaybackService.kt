@@ -26,13 +26,14 @@ import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import mu.KLogging
+import mu.KotlinLogging
+import org.slf4j.impl.HandroidLoggerAdapter
 import ro.expectations.radio.media.extensions.stateName
 import ro.expectations.radio.media.library.MediaBrowser
 
-class PlaybackService : MediaBrowserServiceCompat() {
+private val logger = KotlinLogging.logger {}
 
-    companion object : KLogging()
+class PlaybackService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaBrowser: MediaBrowser
     private lateinit var mediaSession: MediaSessionCompat
@@ -56,6 +57,10 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Set up logging
+        HandroidLoggerAdapter.DEBUG = BuildConfig.DEBUG
+        HandroidLoggerAdapter.APP_NAME = "ExR"
 
         // initialise the media library
         mediaBrowser = MediaBrowser(
@@ -108,7 +113,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
-        logger.info { "onTaskRemoved" }
+        logger.debug { "onTaskRemoved" }
 
         /**
          * By stopping playback, the player will transition to [Player.STATE_IDLE]. This will
@@ -122,7 +127,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
     override fun onDestroy() {
 
-        logger.info { "onDestroy" }
+        logger.debug { "onDestroy" }
 
         mediaSession.run {
             isActive = false
@@ -136,14 +141,14 @@ class PlaybackService : MediaBrowserServiceCompat() {
         rootHints: Bundle?
     ): MediaBrowserServiceCompat.BrowserRoot? {
 
-        logger.info { "onGetRoot: $clientPackageName, $clientUid, $rootHints" }
+        logger.debug { "onGetRoot: $clientPackageName, $clientUid, $rootHints" }
 
         return mediaBrowser.onGetRoot(clientPackageName, clientUid, rootHints)
     }
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
 
-        logger.info { "onLoadChildren: $parentId" }
+        logger.debug { "onLoadChildren: $parentId" }
 
         mediaBrowser.onLoadChildren(parentId, result)
     }
@@ -156,7 +161,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             super.onMetadataChanged(metadata)
 
-            logger.info { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
+            logger.debug { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
 
             if (metadata != null) {
                 mediaSession.controller.playbackState?.let { updateNotification(it) }
@@ -166,7 +171,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             super.onPlaybackStateChanged(state)
 
-            logger.info { "MediaControllerCallback::onPlaybackStateChanged: ${state?.stateName} -> $state" }
+            logger.debug { "MediaControllerCallback::onPlaybackStateChanged: ${state?.stateName} -> $state" }
 
             state?.let { updateNotification(it) }
         }

@@ -23,6 +23,7 @@ buildscript {
 
         // Logging libraries versions
         kotlin_logging_version = '1.6.25'
+        slf4j_handroid_version = '1.7.27'
 
         // Testing libraries versions
         junit_version = '4.12'

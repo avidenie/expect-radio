@@ -42,6 +42,7 @@ dependencies {
 
     // Logging
     implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"
+    implementation "sk.baka.slf4j:slf4j-handroid:$slf4j_handroid_version"
 
     // Testing
     testImplementation "junit:junit:$junit_version"

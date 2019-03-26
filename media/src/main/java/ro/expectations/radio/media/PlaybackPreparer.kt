@@ -11,17 +11,17 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.PlaybackPreparer.ACTIONS
 import com.google.android.exoplayer2.upstream.DataSource
-import mu.KLogging
+import mu.KotlinLogging
 import ro.expectations.radio.media.extensions.toMediaSource
+
+private val logger = KotlinLogging.logger {}
 
 class PlaybackPreparer(private val exoPlayer: ExoPlayer,
                        private val dataSourceFactory: DataSource.Factory)
     : MediaSessionConnector.PlaybackPreparer {
 
-    companion object : KLogging()
-
     override fun getSupportedPrepareActions(): Long {
-        logger.info { "getSupportedPrepareActions" }
+        logger.debug { "getSupportedPrepareActions" }
 
         return ACTIONS
     }
@@ -29,7 +29,7 @@ class PlaybackPreparer(private val exoPlayer: ExoPlayer,
     override fun onPrepare() = Unit
 
     override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
-        logger.info { "onPrepareFromMediaId -> mediaId: $mediaId, extras: $extras" }
+        logger.debug { "onPrepareFromMediaId -> mediaId: $mediaId, extras: $extras" }
 
         val metadataList = listOf(MediaMetadataCompat.Builder()
             .putText(METADATA_KEY_MEDIA_ID, mediaId)
