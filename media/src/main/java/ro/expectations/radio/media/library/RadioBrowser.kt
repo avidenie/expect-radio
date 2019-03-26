@@ -47,9 +47,9 @@ class RadioBrowser(private val db: FirebaseFirestore) {
                         val description = MediaDescriptionCompat.Builder()
                             .setMediaId(document.id)
                             .setTitle(document.getString("name"))
-                            .setSubtitle(document.getString("slogan"))
-                            .setIconUri(Uri.parse(document.getString("logo")))
-                            .setMediaUri(Uri.parse(document.getString("source")))
+                            .setSubtitle(document.getString("tagline"))
+                            .setIconUri(Uri.parse(document.getString("icon")))
+                            .setMediaUri(Uri.parse(document.getString("src")))
                             .build()
                         recommended.add(MediaBrowserCompat.MediaItem(description, FLAG_PLAYABLE))
                     }
