@@ -6,32 +6,25 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP
-import mu.KLogging
 import ro.expectations.radio.media.extensions.isPlayEnabled
 import ro.expectations.radio.media.extensions.isPlaying
 import ro.expectations.radio.media.extensions.isSkipToNextEnabled
 import ro.expectations.radio.media.extensions.isSkipToPreviousEnabled
 
-const val NOW_PLAYING_CHANNEL: String = "ro.expectations.radio.media.NOW_PLAYING"
+private const val NOW_PLAYING_CHANNEL: String = "ro.expectations.radio.media.NOW_PLAYING"
 const val NOW_PLAYING_NOTIFICATION: Int = 0xb095
 
 /**
  * Helper class to encapsulate code for building notifications.
  */
 class NotificationBuilder(private val context: Context) {
-
-    companion object : KLogging()
 
     private val platformNotificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
