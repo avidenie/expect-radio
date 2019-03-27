@@ -1,6 +1,7 @@
 package ro.expectations.radio.media.library
 
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -23,7 +24,7 @@ class MediaBrowser(private val auth: FirebaseAuth, db: FirebaseFirestore) {
         return MediaBrowserServiceCompat.BrowserRoot(BROWSABLE_ROOT, null)
     }
 
-    fun loadChildren(parentId: String) : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+    fun loadChildren(parentId: String) : Task<List<MediaBrowserCompat.MediaItem>> =
         whenAuthenticated()
             .continueWithTask {
                 when (parentId) {
@@ -38,10 +39,10 @@ class MediaBrowser(private val auth: FirebaseAuth, db: FirebaseFirestore) {
                 }
             }
 
-    private fun getEmptyRoot() : Task <MutableList<MediaBrowserCompat.MediaItem>> = Tasks.forResult(mutableListOf())
+    private fun getEmptyRoot() : Task <List<MediaBrowserCompat.MediaItem>> = Tasks.forResult(mutableListOf())
 
-    private fun getBrowsableRoot() : Task<MutableList<MediaBrowserCompat.MediaItem>> {
-        val sections = mutableListOf(
+    private fun getBrowsableRoot() : Task<List<MediaBrowserCompat.MediaItem>> {
+        val sections = listOf(
             radioBrowser.getRoot(),
             podcastBrowser.getRoot(),
             musicBrowser.getRoot()
@@ -59,7 +60,11 @@ class MediaBrowser(private val auth: FirebaseAuth, db: FirebaseFirestore) {
         }
     }
 
-    fun getRadios() : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+    fun getRadios() : Task<List<MediaMetadataCompat>> =
         whenAuthenticated()
             .continueWithTask { if(it.isSuccessful) radioBrowser.getRadios() else throw it.exception!! }
+
+    fun getRadio(id: String) : Task<MediaMetadataCompat> =
+        whenAuthenticated()
+            .continueWithTask { if(it.isSuccessful) radioBrowser.getRadio(id) else throw it.exception!! }
 }

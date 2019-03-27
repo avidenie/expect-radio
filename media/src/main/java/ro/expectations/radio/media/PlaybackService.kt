@@ -153,7 +153,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
         result.detach()
 
         mediaBrowser.loadChildren(parentId)
-            .addOnSuccessListener { result.sendResult(it) }
+            .addOnSuccessListener { result.sendResult(it.toMutableList()) }
             .addOnFailureListener { result.sendResult(null) }
     }
 

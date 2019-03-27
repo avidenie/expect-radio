@@ -22,11 +22,9 @@ class MusicBrowser(private val db: FirebaseFirestore) {
 
     fun canLoadChildren(parentId: String): Boolean = parentId.startsWith(rootId, true)
 
-    fun loadChildren(parentId: String) : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+    fun loadChildren(parentId: String) : Task<List<MediaBrowserCompat.MediaItem>> =
         when (parentId) {
-            rootId -> getMusic()
+            rootId -> Tasks.forResult(listOf())
             else -> throw RuntimeException("Invalid parent media item requested")
         }
-
-    private fun getMusic() : Task<MutableList<MediaBrowserCompat.MediaItem>> = Tasks.forResult(mutableListOf())
 }

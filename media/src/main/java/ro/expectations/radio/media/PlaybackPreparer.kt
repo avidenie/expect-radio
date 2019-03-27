@@ -30,45 +30,33 @@ class PlaybackPreparer(private val mediaBrowser: MediaBrowser,
 
     override fun onPrepare() = Unit
 
-    override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
+    override fun onPrepareFromMediaId(mediaId: String, extras: Bundle?) {
         logger.debug { "onPrepareFromMediaId -> mediaId: $mediaId, extras: $extras" }
 
-        mediaBrowser.getRadios()
-            .addOnSuccessListener { radios ->
+        mediaBrowser.getRadio(mediaId)
+            .addOnSuccessListener { current ->
+                mediaBrowser.getRadios()
+                    .addOnSuccessListener { radios ->
 
-                logger.error { "got radios: $radios" }
+                        var currentWindowIndex = radios?.indexOfFirst {
+                            current.getText(METADATA_KEY_MEDIA_ID) == it.getText(METADATA_KEY_MEDIA_ID)
+                        }
+                        if (currentWindowIndex == null || currentWindowIndex == -1) {
+                            currentWindowIndex = 0
+                        }
 
-                var initialWindowIndex = 0
-                var currentIndex = 0
-
-                val metadataList = radios.map {
-
-                    logger.debug { "onPrepareFromMediaId -> preparing $it" }
-
-                    currentIndex++
-                    if (it.mediaId == mediaId) {
-                        initialWindowIndex = currentIndex
+                        exoPlayer.prepare(radios?.toMediaSource(dataSourceFactory))
+                        exoPlayer.seekTo(currentWindowIndex, 0)
                     }
-                    MediaMetadataCompat.Builder()
-                        .putText(METADATA_KEY_MEDIA_ID, it.mediaId)
-                        .putText(METADATA_KEY_DISPLAY_TITLE, it.description.title)
-                        .putText(METADATA_KEY_DISPLAY_SUBTITLE, it.description.subtitle)
-                        .putText(METADATA_KEY_DISPLAY_ICON_URI, it.description.iconUri.toString())
-                        .putText(METADATA_KEY_MEDIA_URI, it.description.mediaUri.toString())
-                        .build()
-                }
+                    .addOnFailureListener {
 
-                val mediaSource = metadataList.toMediaSource(dataSourceFactory)
-
-                exoPlayer.prepare(mediaSource)
-                exoPlayer.seekTo(initialWindowIndex, 0)
-
+                        exoPlayer.prepare(listOf(current).toMediaSource(dataSourceFactory))
+                        exoPlayer.seekTo(0, 0)
+                    }
             }
             .addOnFailureListener {
-
-                logger.error(it) { "Failed loading radios: $it" }
-
                 // todo: notify caller of the error
+                logger.error(it) { "Failed preparing from media ID $mediaId: $it" }
             }
     }
 
