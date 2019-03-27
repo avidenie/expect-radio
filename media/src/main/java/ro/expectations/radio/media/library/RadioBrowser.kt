@@ -4,7 +4,7 @@ import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
-import androidx.media.MediaBrowserServiceCompat
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import mu.KotlinLogging
 
@@ -26,23 +26,19 @@ class RadioBrowser(private val db: FirebaseFirestore) {
 
     fun canLoadChildren(parentId: String): Boolean = parentId.startsWith(rootId, true)
 
-    fun onLoadChildren(
-        parentId: String,
-        result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>
-    ) {
-        return when (parentId) {
-            rootId -> onGetRadios(result)
-            else -> result.sendResult(null)
+    fun loadChildren(parentId: String) : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+        when (parentId) {
+            rootId -> getRadios()
+            else -> throw RuntimeException("Invalid parent media item requested")
         }
-    }
 
-    private fun onGetRadios(result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
+    fun getRadios() : Task<MutableList<MediaBrowserCompat.MediaItem>> =
         db.collection("radios")
             .orderBy("name")
             .get()
-            .addOnCompleteListener {
+            .continueWith {
                 if (it.isSuccessful) {
-                    val recommended = mutableListOf<MediaBrowserCompat.MediaItem>()
+                    val radios = mutableListOf<MediaBrowserCompat.MediaItem>()
                     it.result?.documents?.forEach { document ->
                         val description = MediaDescriptionCompat.Builder()
                             .setMediaId(document.id)
@@ -51,13 +47,12 @@ class RadioBrowser(private val db: FirebaseFirestore) {
                             .setIconUri(Uri.parse(document.getString("icon")))
                             .setMediaUri(Uri.parse(document.getString("src")))
                             .build()
-                        recommended.add(MediaBrowserCompat.MediaItem(description, FLAG_PLAYABLE))
+                        radios.add(MediaBrowserCompat.MediaItem(description, FLAG_PLAYABLE))
                     }
-                    result.sendResult(recommended)
+                    radios
                 } else {
-                    logger.error(it.exception) { "Error while retrieving radios" }
-                    result.sendResult(mutableListOf())
+                    logger.warn(it.exception) { "Error retrieving radios" }
+                    mutableListOf()
                 }
             }
-    }
 }

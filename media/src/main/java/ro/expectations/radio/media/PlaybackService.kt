@@ -100,7 +100,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
             // Set the playback preparer
             val userAgent = Util.getUserAgent(this, "Expect Radio")
             val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
-            it.setPlaybackPreparer(PlaybackPreparer(exoPlayer, dataSourceFactory))
+            it.setPlaybackPreparer(PlaybackPreparer(mediaBrowser, exoPlayer, dataSourceFactory))
 
             // Set the default queue navigator
             it.setQueueNavigator(QueueNavigator(mediaSession))
@@ -143,14 +143,18 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
         logger.debug { "onGetRoot: $clientPackageName, $clientUid, $rootHints" }
 
-        return mediaBrowser.onGetRoot(clientPackageName, clientUid, rootHints)
+        return mediaBrowser.getRoot()
     }
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
 
         logger.debug { "onLoadChildren: $parentId" }
 
-        mediaBrowser.onLoadChildren(parentId, result)
+        result.detach()
+
+        mediaBrowser.loadChildren(parentId)
+            .addOnSuccessListener { result.sendResult(it) }
+            .addOnFailureListener { result.sendResult(null) }
     }
 
     /**

@@ -13,10 +13,12 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.Play
 import com.google.android.exoplayer2.upstream.DataSource
 import mu.KotlinLogging
 import ro.expectations.radio.media.extensions.toMediaSource
+import ro.expectations.radio.media.library.MediaBrowser
 
 private val logger = KotlinLogging.logger {}
 
-class PlaybackPreparer(private val exoPlayer: ExoPlayer,
+class PlaybackPreparer(private val mediaBrowser: MediaBrowser,
+                       private val exoPlayer: ExoPlayer,
                        private val dataSourceFactory: DataSource.Factory)
     : MediaSessionConnector.PlaybackPreparer {
 
@@ -31,19 +33,43 @@ class PlaybackPreparer(private val exoPlayer: ExoPlayer,
     override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
         logger.debug { "onPrepareFromMediaId -> mediaId: $mediaId, extras: $extras" }
 
-        val metadataList = listOf(MediaMetadataCompat.Builder()
-            .putText(METADATA_KEY_MEDIA_ID, mediaId)
-            .putText(METADATA_KEY_DISPLAY_TITLE, "Europa FM")
-            .putText(METADATA_KEY_DISPLAY_SUBTITLE, "Pe aceeași frecvență cu tine!")
-            .putText(METADATA_KEY_DISPLAY_DESCRIPTION, "Ascultă online Europa FM și află primul știrile care contează și relaxează-te cu cea mai bună muzică!")
-            .putText(METADATA_KEY_DISPLAY_ICON_URI, "https://storage.googleapis.com/expect-radio.appspot.com/logos%2Fum7shzY1bGNuuzA9ZJoD.jpg?GoogleAccessId=firebase-adminsdk-j842w%40expect-radio.iam.gserviceaccount.com&Expires=16725225600&Signature=IxnMnxirZun8DG%2FFM0hwISt9XcNq5YfwQu7%2B8UNXGLyD4vud3p5lqw9ccs2qcGEKlMYrsQoKC2Y%2BWT1PEKczZJUcvJk3tfPwkuGLg2w1UGIRbrBjwGFYcCLL%2BdemJDo9W16KIZYtHWXcLQwoxcWf2npheo%2FSfAEemumvCwLNnxqxNNmrQc0eseNZgDKwTh0GLyhD0zj6WGB9sg3AU%2FxSL9XuKd972beRI7SuO8xAyCXdAKaFruCn9tGnUw0p2ihdAcRGpnTxls2fkeM%2F1QLxDkUm24jgF0rk3dZZDUyzES0%2FokLzAENkriRzoamwnbgOA2u5GQ2vrfpC%2BJJfquGFQQ%3D%3D")
-            .putText(METADATA_KEY_MEDIA_URI, "http://astreaming.europafm.ro:8000/europafm_mp3_64k")
-            .build()
-        )
-        val mediaSource = metadataList.toMediaSource(dataSourceFactory)
+        mediaBrowser.getRadios()
+            .addOnSuccessListener { radios ->
 
-        exoPlayer.prepare(mediaSource)
-        exoPlayer.seekTo(0, 0);
+                logger.error { "got radios: $radios" }
+
+                var initialWindowIndex = 0
+                var currentIndex = 0
+
+                val metadataList = radios.map {
+
+                    logger.debug { "onPrepareFromMediaId -> preparing $it" }
+
+                    currentIndex++
+                    if (it.mediaId == mediaId) {
+                        initialWindowIndex = currentIndex
+                    }
+                    MediaMetadataCompat.Builder()
+                        .putText(METADATA_KEY_MEDIA_ID, it.mediaId)
+                        .putText(METADATA_KEY_DISPLAY_TITLE, it.description.title)
+                        .putText(METADATA_KEY_DISPLAY_SUBTITLE, it.description.subtitle)
+                        .putText(METADATA_KEY_DISPLAY_ICON_URI, it.description.iconUri.toString())
+                        .putText(METADATA_KEY_MEDIA_URI, it.description.mediaUri.toString())
+                        .build()
+                }
+
+                val mediaSource = metadataList.toMediaSource(dataSourceFactory)
+
+                exoPlayer.prepare(mediaSource)
+                exoPlayer.seekTo(initialWindowIndex, 0)
+
+            }
+            .addOnFailureListener {
+
+                logger.error(it) { "Failed loading radios: $it" }
+
+                // todo: notify caller of the error
+            }
     }
 
     override fun onPrepareFromUri(uri: Uri?, extras: Bundle?) = Unit

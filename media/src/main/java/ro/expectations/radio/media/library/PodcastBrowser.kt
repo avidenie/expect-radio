@@ -2,7 +2,8 @@ package ro.expectations.radio.media.library
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
-import androidx.media.MediaBrowserServiceCompat
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PodcastBrowser(private val db: FirebaseFirestore) {
@@ -21,15 +22,11 @@ class PodcastBrowser(private val db: FirebaseFirestore) {
 
     fun canLoadChildren(parentId: String): Boolean = parentId.startsWith(rootId, true)
 
-    fun onLoadChildren(parentId: String, result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-
-        return when (parentId) {
-            rootId -> onGetPodcasts(result)
-            else -> result.sendResult(null)
+    fun loadChildren(parentId: String) : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+        when (parentId) {
+            rootId -> getPodcasts()
+            else -> throw RuntimeException("Invalid parent media item requested")
         }
-    }
 
-    private fun onGetPodcasts(result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-        result.sendResult(mutableListOf())
-    }
+    private fun getPodcasts() : Task<MutableList<MediaBrowserCompat.MediaItem>> = Tasks.forResult(mutableListOf())
 }

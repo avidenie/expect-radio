@@ -1,9 +1,11 @@
 package ro.expectations.radio.media.library
 
-import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MediaBrowser(private val auth: FirebaseAuth, db: FirebaseFirestore) {
@@ -13,62 +15,51 @@ class MediaBrowser(private val auth: FirebaseAuth, db: FirebaseFirestore) {
         const val BROWSABLE_ROOT = "__root__"
     }
 
-    private val radioLibrary = RadioBrowser(db)
-    private val musicLibrary = MusicBrowser(db)
-    private val podcastLibrary = PodcastBrowser(db)
+    private val radioBrowser = RadioBrowser(db)
+    private val musicBrowser = MusicBrowser(db)
+    private val podcastBrowser = PodcastBrowser(db)
 
-    fun onGetRoot(
-        clientPackageName: String,
-        clientUid: Int,
-        rootHints: Bundle?
-    ): MediaBrowserServiceCompat.BrowserRoot? {
+    fun getRoot(): MediaBrowserServiceCompat.BrowserRoot? {
         return MediaBrowserServiceCompat.BrowserRoot(BROWSABLE_ROOT, null)
     }
 
-    fun onLoadChildren(parentId: String, result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-
-        result.detach()
-
-        if (auth.currentUser == null) {
-            auth.signInAnonymously().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    onAuth(parentId, result)
-                } else {
-                    result.sendResult(null)
+    fun loadChildren(parentId: String) : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+        whenAuthenticated()
+            .continueWithTask {
+                when (parentId) {
+                    EMPTY_ROOT -> getEmptyRoot()
+                    BROWSABLE_ROOT -> getBrowsableRoot()
+                    else -> when {
+                        radioBrowser.canLoadChildren(parentId) -> radioBrowser.loadChildren(parentId)
+                        podcastBrowser.canLoadChildren(parentId) -> podcastBrowser.loadChildren(parentId)
+                        musicBrowser.canLoadChildren(parentId) -> musicBrowser.loadChildren(parentId)
+                        else -> throw RuntimeException("Invalid parent media item requested")
+                    }
                 }
             }
-        } else {
-            onAuth(parentId, result)
-        }
-    }
 
-    private fun onEmptyRoot(result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
-        result.sendResult(mutableListOf())
-    }
+    private fun getEmptyRoot() : Task <MutableList<MediaBrowserCompat.MediaItem>> = Tasks.forResult(mutableListOf())
 
-    private fun onBrowsableRoot(result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>) {
+    private fun getBrowsableRoot() : Task<MutableList<MediaBrowserCompat.MediaItem>> {
         val sections = mutableListOf(
-            radioLibrary.getRoot(),
-            podcastLibrary.getRoot(),
-            musicLibrary.getRoot()
+            radioBrowser.getRoot(),
+            podcastBrowser.getRoot(),
+            musicBrowser.getRoot()
         )
 
-        result.sendResult(sections)
+        return Tasks.forResult(sections)
     }
 
-    private fun onAuth(
-        parentId: String,
-        result: MediaBrowserServiceCompat.Result<MutableList<MediaBrowserCompat.MediaItem>>
-    ) {
-        return when (parentId) {
-            EMPTY_ROOT -> onEmptyRoot(result)
-            BROWSABLE_ROOT -> onBrowsableRoot(result)
-            else -> when {
-                radioLibrary.canLoadChildren(parentId) -> radioLibrary.onLoadChildren(parentId, result)
-                podcastLibrary.canLoadChildren(parentId) -> podcastLibrary.onLoadChildren(parentId, result)
-                musicLibrary.canLoadChildren(parentId) -> musicLibrary.onLoadChildren(parentId, result)
-                else -> result.sendResult(null)
-            }
+    private fun whenAuthenticated() : Task<FirebaseUser> {
+
+        return if (auth.currentUser == null) {
+            auth.signInAnonymously().continueWith { it.result?.user }
+        } else {
+            Tasks.forResult(auth.currentUser)
         }
     }
+
+    fun getRadios() : Task<MutableList<MediaBrowserCompat.MediaItem>> =
+        whenAuthenticated()
+            .continueWithTask { if(it.isSuccessful) radioBrowser.getRadios() else throw it.exception!! }
 }
