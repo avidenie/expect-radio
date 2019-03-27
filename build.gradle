@@ -14,8 +14,8 @@ buildscript {
 
         // Dependency versions
         kotlin_version = '1.3.21'
-        appcompat_version = '1.0.2'
-        androidx_version = '1.0.1'
+        androidx_lifecycle_version = '2.0.0'
+        androidx_media_version = '1.0.1'
 
         // Firebase
         firebase_auth_version = '16.2.0'

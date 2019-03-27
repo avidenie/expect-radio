@@ -30,7 +30,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Android libraries
-    implementation "androidx.media:media:$androidx_version"
+    implementation "androidx.media:media:$androidx_media_version"
 
     // ExoPlayer
     implementation project(':exo-library-core')
