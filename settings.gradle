@@ -1,7 +1,6 @@
 include ':app', ':media'
 
 // Depend on a local checkout of ExoPlayer
-
 gradle.ext.exoplayerRoot = 'exoplayer'
 gradle.ext.exoplayerModulePrefix = 'exo-'
 

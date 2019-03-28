@@ -3,14 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
+    compileSdkVersion build_versions.target_sdk
 
     defaultConfig {
-        versionCode rootProject.versionCode
-        versionName rootProject.versionName
 
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
+        versionCode app_version.code
+        versionName app_version.name
+
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -27,25 +28,25 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation deps.kotlin.stdlib
 
     // Android libraries
-    implementation "androidx.media:media:$androidx_media_version"
+    implementation deps.androidx.media
 
     // ExoPlayer
     implementation project(':exo-library-core')
     implementation project(':exo-extension-mediasession')
 
     // Firebase
-    implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
-    implementation "com.google.firebase:firebase-firestore:$firebase_firestore_version"
+    implementation deps.firebase.auth
+    implementation deps.firebase.firestore
 
     // Logging
-    implementation "io.github.microutils:kotlin-logging:$kotlin_logging_version"
-    implementation "sk.baka.slf4j:slf4j-handroid:$slf4j_handroid_version"
+    implementation deps.log.kotlin_logging
+    implementation deps.log.slf4j_handroid
 
     // Testing
-    testImplementation "junit:junit:$junit_version"
-    androidTestImplementation "androidx.test:runner:$test_runner_version"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.ext_junit
+    androidTestImplementation deps.test.espresso_core
 }
