@@ -29,6 +29,10 @@ androidx.lifecycle_extensions = "androidx.lifecycle:lifecycle-extensions:2.0.0"
 androidx.media = "androidx.media:media:1.0.1"
 deps.androidx = androidx
 
+def google = [:]
+google.material = "com.google.android.material:material:1.1.0-alpha04"
+deps.google = google
+
 def firebase = [:]
 firebase.auth = "com.google.firebase:firebase-auth:16.2.0"
 firebase.firestore = "com.google.firebase:firebase-firestore:18.1.0"

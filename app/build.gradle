@@ -45,6 +45,9 @@ dependencies {
     implementation deps.androidx.lifecycle_extensions
     implementation deps.androidx.media
 
+    // Material Design
+    implementation deps.google.material
+
     // Logging
     implementation deps.log.kotlin_logging
     implementation deps.log.slf4j_handroid
