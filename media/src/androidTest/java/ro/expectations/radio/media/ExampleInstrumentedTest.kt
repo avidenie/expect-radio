@@ -1,4 +1,4 @@
-package ro.expectations.radio
+package ro.expectations.radio.media
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -20,6 +20,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = ApplicationProvider.getApplicationContext<Context>()
-        assertEquals("ro.expectations.radio", appContext.packageName)
+        assertEquals("ro.expectations.radio.media", appContext.packageName)
     }
 }
