@@ -1,9 +1,6 @@
 package ro.expectations.radio.media.library
 
-import android.media.browse.MediaBrowser
-import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import com.google.android.gms.tasks.Task
