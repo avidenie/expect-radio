@@ -13,6 +13,8 @@ android {
         minSdkVersion build_versions.min_sdk
         targetSdkVersion build_versions.target_sdk
 
+        resConfigs "en"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

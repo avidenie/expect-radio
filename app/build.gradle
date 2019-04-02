@@ -19,6 +19,8 @@ android {
             targetCompatibility JavaVersion.VERSION_1_8
         }
 
+        resConfigs "en"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

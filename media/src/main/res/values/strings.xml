@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
 
     <!-- Notification Channel -->
     <string name="notification_channel_name">Now Playing</string>
