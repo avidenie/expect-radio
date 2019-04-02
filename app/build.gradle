@@ -42,11 +42,16 @@ dependencies {
     // Android libraries
     implementation deps.androidx.appcompat
     implementation deps.androidx.constraintlayout
+    implementation deps.androidx.core_ktx
     implementation deps.androidx.lifecycle_extensions
     implementation deps.androidx.media
 
     // Material Design
     implementation deps.google.material
+
+    // Navigation component
+    implementation deps.navigation.fragment_ktx
+    implementation deps.navigation.ui_ktx
 
     // Logging
     implementation deps.log.kotlin_logging
