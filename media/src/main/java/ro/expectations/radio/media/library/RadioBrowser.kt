@@ -30,7 +30,7 @@ class RadioBrowser(private val db: FirebaseFirestore) {
         when (parentId) {
             rootId -> getRadios().continueWith {
                 it.result?.map { metadata ->
-                    MediaBrowserCompat.MediaItem(metadata.description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+                    MediaBrowserCompat.MediaItem(metadata.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
                 }
             }
             else -> throw RuntimeException("Invalid parent media item requested")
