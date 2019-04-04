@@ -6,7 +6,7 @@ import ro.expectations.radio.media.PlaybackService
 
 object InjectorUtils {
 
-    fun provideMainActivityViewModel(context: Context): MediaSessionViewModel.Factory {
+    fun provideMediaSessionViewModel(context: Context): MediaSessionViewModel.Factory {
         val applicationContext = context.applicationContext
         val mediaSessionConnection = provideMediaSessionConnection(applicationContext)
         return MediaSessionViewModel.Factory(mediaSessionConnection)

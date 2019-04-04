@@ -2,15 +2,12 @@ package ro.expectations.radio
 
 import android.media.AudioManager
 import android.os.Bundle
-import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import mu.KotlinLogging
@@ -45,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         // Connect to the Media Session
         viewModel = ViewModelProviders
-            .of(this, InjectorUtils.provideMainActivityViewModel(this))
+            .of(this, InjectorUtils.provideMediaSessionViewModel(this))
             .get(MediaSessionViewModel::class.java)
 
         // Only set up the BottomNavigationView if the the activity is NOT being re-initialized
