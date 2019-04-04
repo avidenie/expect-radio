@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/podcasts"
+    app:startDestination="@id/podcastsFragment">
+
+    <fragment
+        android:id="@+id/podcastsFragment"
+        android:name="ro.expectations.radio.PodcastsFragment"
+        android:label="@string/podcasts"
+        tools:layout="@layout/fragment_podcasts" >
+        <action
+            android:id="@+id/action_podcastsFragment_to_podcastFragment"
+            app:destination="@id/podcastFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/podcastFragment"
+        android:name="ro.expectations.radio.PodcastFragment"
+        android:label="Podcast details"
+        tools:layout="@layout/fragment_podcast" />
+</navigation>

@@ -35,8 +35,8 @@ google.material = "com.google.android.material:material:1.1.0-alpha04"
 deps.google = google
 
 def navigation = [:]
-navigation.fragment_ktx = "androidx.navigation:navigation-fragment-ktx:2.0.0"
-navigation.ui_ktx = "androidx.navigation:navigation-ui-ktx:2.0.0"
+navigation.fragment_ktx = "androidx.navigation:navigation-fragment-ktx:2.1.0-alpha01"
+navigation.ui_ktx = "androidx.navigation:navigation-ui-ktx:2.1.0-alpha01"
 deps.navigation = navigation
 
 def firebase = [:]
