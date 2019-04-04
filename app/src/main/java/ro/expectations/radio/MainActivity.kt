@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         logger.debug { "MainActivity::onCreate" }
 
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
 
         // Since the app plays audio media files the volume controls should adjust the music volume.
         volumeControlStream = AudioManager.STREAM_MUSIC
