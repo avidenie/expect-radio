@@ -3,6 +3,7 @@ package ro.expectations.radio
 import android.content.ComponentName
 import android.content.Context
 import ro.expectations.radio.media.PlaybackService
+import ro.expectations.radio.viewmodels.MediaSessionViewModel
 
 object InjectorUtils {
 
