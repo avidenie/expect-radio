@@ -47,6 +47,7 @@ dependencies {
     implementation deps.androidx.core_ktx
     implementation deps.androidx.lifecycle_extensions
     implementation deps.androidx.media
+    implementation deps.androidx.recyclerview
 
     // Material Design
     implementation deps.google.material
