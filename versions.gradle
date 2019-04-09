@@ -11,7 +11,7 @@ ext.build_versions = build_versions
 ext.deps = [:]
 
 def versions = [:]
-versions.kotlin = "1.3.20"
+versions.kotlin = "1.3.21"
 
 def deps = [:]
 deps.android_gradle_plugin = "com.android.tools.build:gradle:3.3.2"
