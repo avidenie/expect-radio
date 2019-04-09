@@ -59,6 +59,9 @@ dependencies {
     implementation deps.log.kotlin_logging
     implementation deps.log.slf4j_handroid
 
+    // Glide image loading library
+    implementation deps.glide
+
     // Testing
     testImplementation deps.test.junit
     androidTestImplementation deps.test.ext_junit
