@@ -10,13 +10,5 @@
         android:name="ro.expectations.radio.RadiosFragment"
         android:label="@string/radios"
         tools:layout="@layout/fragment_radios" >
-        <action
-            android:id="@+id/action_radiosFragment_to_radioFragment"
-            app:destination="@+id/radioFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/radioFragment"
-        android:name="ro.expectations.radio.RadioFragment"
-        android:label="Radio details"
-        tools:layout="@layout/fragment_radio" />
 </navigation>
