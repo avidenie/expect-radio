@@ -41,7 +41,6 @@ class RadiosFragment : Fragment() {
             }
         }
 
-
         // Initialise the ViewModels
         mediaSessionViewModel = ViewModelProviders
             .of(context, InjectorUtils.provideMediaSessionViewModel(context))
@@ -54,7 +53,9 @@ class RadiosFragment : Fragment() {
         // Observe the data and populate the list
         mediaItemViewModel.mediaItems.observe(this,
             Observer<List<MediaBrowserCompat.MediaItem>> { list ->
-                loading.visibility = View.GONE
+                if (!list.isEmpty()) {
+                    loading.visibility = View.GONE
+                }
                 listAdapter.submitList(list)
             })
 
