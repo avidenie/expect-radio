@@ -1,5 +1,5 @@
 def app_version = [:]
-app_version.code = 3
+app_version.code = 4
 app_version.name = "1.0.0"
 ext.app_version = app_version
 
