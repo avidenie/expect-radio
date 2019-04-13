@@ -2,6 +2,7 @@ package ro.expectations.radio
 
 import android.media.AudioManager
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentManager
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_main.*
 import mu.KotlinLogging
@@ -39,6 +41,16 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        appBar.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
+            override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
+                if (state == State.EXPANDED) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                }
+            }
+        })
 
         // Since the app plays audio media files the volume controls should adjust the music volume.
         volumeControlStream = AudioManager.STREAM_MUSIC
