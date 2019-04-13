@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_podcasts.*
 
 class PodcastsFragment : Fragment() {
@@ -19,5 +20,15 @@ class PodcastsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         button.setOnClickListener { findNavController().navigate(R.id.action_podcastsFragment_to_podcastFragment) }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity.apply {
+            if (this is MainActivity) {
+                backdrop.setImageResource(R.drawable.backdrop_podcast)
+            }
+        }
     }
 }

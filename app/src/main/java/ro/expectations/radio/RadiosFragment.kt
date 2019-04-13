@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_radios.*
 import ro.expectations.radio.viewmodels.MediaItemViewModel
 import ro.expectations.radio.viewmodels.MediaSessionViewModel
@@ -33,6 +34,13 @@ class RadiosFragment : Fragment() {
 
         // Always true, but lets lint know that as well.
         val context = activity ?: return
+
+        activity.apply {
+            if (this is MainActivity) {
+                backdrop.setImageResource(R.drawable.backdrop_radio)
+            }
+        }
+
 
         // Initialise the ViewModels
         mediaSessionViewModel = ViewModelProviders

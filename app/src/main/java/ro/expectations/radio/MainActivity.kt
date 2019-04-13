@@ -3,12 +3,14 @@ package ro.expectations.radio
 import android.media.AudioManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.NavigationUI
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_main.*
 import mu.KotlinLogging
 import org.slf4j.impl.HandroidLoggerAdapter
@@ -80,10 +82,16 @@ class MainActivity : AppCompatActivity() {
             intent = intent
         )
 
-        // Whenever the selected controller changes, setup the action bar.
+        // Whenever the selected controller changes
         controller.observe(this, Observer { navController ->
-            setupActionBarWithNavController(navController)
+
+            // setup the action bar
+            NavigationUI.setupWithNavController(collapsingToolbar, toolbar, navController)
+
+            // and make sure the bottomNavigation is visible
+            ((bottomNavigation.layoutParams as CoordinatorLayout.LayoutParams).behavior as HideBottomViewOnScrollBehavior).slideUp(bottomNavigation)
         })
+
         currentNavController = controller
     }
 }
