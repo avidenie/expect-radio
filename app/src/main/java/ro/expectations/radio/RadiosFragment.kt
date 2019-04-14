@@ -21,7 +21,7 @@ class RadiosFragment : Fragment() {
     private lateinit var mediaItemViewModel: MediaItemViewModel
 
     private val listAdapter = MediaItemAdapter {
-        mediaSessionViewModel.playMedia(it)
+        mediaSessionViewModel.playMedia(it.id)
     }
 
     override fun onCreateView(
@@ -52,8 +52,8 @@ class RadiosFragment : Fragment() {
 
         // Observe the data and populate the list
         mediaItemViewModel.mediaItems.observe(this,
-            Observer<List<MediaBrowserCompat.MediaItem>> { list ->
-                if (!list.isEmpty()) {
+            Observer<List<MediaItem>> { list ->
+                if (list.isNotEmpty()) {
                     loading.visibility = View.GONE
                 }
                 listAdapter.submitList(list)
