@@ -25,10 +25,10 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="#22000000"
-        app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
+        app:layout_constraintBottom_toBottomOf="@+id/centerGuideline"
         app:layout_constraintStart_toStartOf="@+id/icon"
         app:layout_constraintEnd_toEndOf="@+id/icon"
-        app:layout_constraintTop_toBottomOf="@+id/centerGuideline"
+        app:layout_constraintTop_toTopOf="@+id/centerGuideline"
         android:visibility="gone">
         <ProgressBar
             android:layout_width="20dp"
@@ -38,7 +38,7 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:ellipsize="end"
@@ -46,8 +46,18 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/playing"
         tools:text="Song Title" />
+
+    <ImageView
+        android:id="@+id/playing"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/title"
+        app:layout_constraintStart_toEndOf="@+id/title"
+        app:layout_constraintTop_toTopOf="@+id/title"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/subtitle"
