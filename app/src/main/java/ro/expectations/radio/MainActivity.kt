@@ -8,13 +8,13 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_main.*
 import mu.KotlinLogging
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.slf4j.impl.HandroidLoggerAdapter
 import ro.expectations.radio.extensions.setupWithNavController
 import ro.expectations.radio.media.BuildConfig
@@ -25,7 +25,7 @@ private val logger = KotlinLogging.logger {}
 class MainActivity : AppCompatActivity() {
 
     private var currentNavController: LiveData<NavController>? = null
-    private lateinit var viewModel: MediaSessionViewModel
+    private val mediaSessionViewModel: MediaSessionViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,9 +56,11 @@ class MainActivity : AppCompatActivity() {
         volumeControlStream = AudioManager.STREAM_MUSIC
 
         // Connect to the Media Session
-        viewModel = ViewModelProviders
-            .of(this, InjectorUtils.provideMediaSessionViewModel(this))
-            .get(MediaSessionViewModel::class.java)
+        mediaSessionViewModel.isConnected.observe(this, Observer { connected ->
+            if (connected) {
+                logger.debug { "Media session connected" }
+            }
+        })
 
         // Only set up the BottomNavigationView if the the activity is NOT being re-initialized
         // from a previously saved state. Else, wait for onRestoreInstanceState.

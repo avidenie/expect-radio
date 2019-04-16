@@ -2,7 +2,6 @@ package ro.expectations.radio.viewmodels
 
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import mu.KotlinLogging
 import ro.expectations.radio.MediaSessionConnection
 import ro.expectations.radio.media.extensions.isPlayEnabled
@@ -12,6 +11,8 @@ import ro.expectations.radio.media.extensions.isPrepared
 private val logger = KotlinLogging.logger {}
 
 class MediaSessionViewModel(private val mediaSessionConnection: MediaSessionConnection) : ViewModel() {
+
+    val isConnected = mediaSessionConnection.isConnected
 
     fun playMedia(mediaId: String) {
         val nowPlaying = mediaSessionConnection.nowPlaying.value
@@ -30,16 +31,6 @@ class MediaSessionViewModel(private val mediaSessionConnection: MediaSessionConn
             }
         } else {
             transportControls.playFromMediaId(mediaId, null)
-        }
-    }
-
-    class Factory(
-        private val mediaSessionConnection: MediaSessionConnection
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress("unchecked_cast")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MediaSessionViewModel(mediaSessionConnection) as T
         }
     }
 }

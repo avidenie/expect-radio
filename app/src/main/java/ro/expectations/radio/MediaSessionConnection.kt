@@ -22,18 +22,6 @@ private val logger = KotlinLogging.logger {}
 
 class MediaSessionConnection(context: Context, serviceComponent: ComponentName) {
 
-    companion object {
-
-        @Volatile
-        private var instance: MediaSessionConnection? = null
-
-        fun getInstance(context: Context, serviceComponent: ComponentName) =
-            instance ?: synchronized(this) {
-                instance ?: MediaSessionConnection(context, serviceComponent)
-                    .also { instance = it }
-            }
-    }
-
     val isConnected = MutableLiveData<Boolean>().apply { postValue(false) }
 
     val playbackState = MutableLiveData<PlaybackStateCompat>().apply { postValue(EMPTY_PLAYBACK_STATE) }

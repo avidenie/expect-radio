@@ -38,6 +38,10 @@ dependencies {
     // Media session library
     implementation project(':media')
 
+    // Dependency injection
+    implementation deps.koin.android
+    implementation deps.koin.viewmodel
+
     // Kotlin
     implementation deps.kotlin.stdlib
 

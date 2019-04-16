@@ -96,15 +96,4 @@ class MediaItemViewModel(private val parentId: String, mediaSessionConnection: M
             it.copy(playbackState = itemPlaybackState)
         } ?: emptyList()
     }
-
-    class Factory(
-        private val parentId: String,
-        private val mediaSessionConnection: MediaSessionConnection
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress("unchecked_cast")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MediaItemViewModel(parentId, mediaSessionConnection) as T
-        }
-    }
 }
