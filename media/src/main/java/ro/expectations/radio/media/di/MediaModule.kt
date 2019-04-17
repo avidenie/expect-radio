@@ -12,15 +12,11 @@ import ro.expectations.radio.media.repository.RadioRepository
 
 val mediaModule: Module = module {
 
-    single { FirebaseAuth.getInstance() }
+    single { AuthProvider(FirebaseAuth.getInstance()) }
 
-    single { AuthProvider(get()) }
-
-    single { FirebaseFirestore.getInstance() }
-
-    single { RadioRepository(get(), get()) }
-    single { PodcastRepository(get(), get()) }
-    single { MusicRepository(get(), get()) }
+    single { RadioRepository(get(), FirebaseFirestore.getInstance()) }
+    single { PodcastRepository(get(), FirebaseFirestore.getInstance()) }
+    single { MusicRepository(get(), FirebaseFirestore.getInstance()) }
 
     single { MediaBrowser(get(), get(), get(), get()) }
 }
