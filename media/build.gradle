@@ -29,6 +29,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Dependency injection
+    implementation deps.koin.android
+
     // Kotlin
     implementation deps.kotlin.stdlib
 

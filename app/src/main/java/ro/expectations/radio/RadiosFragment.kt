@@ -12,13 +12,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_radios.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import ro.expectations.radio.media.browser.MediaBrowser
 import ro.expectations.radio.viewmodels.MediaItemViewModel
 import ro.expectations.radio.viewmodels.MediaSessionViewModel
 
 class RadiosFragment : Fragment() {
 
     private val mediaSessionViewModel: MediaSessionViewModel by viewModel()
-    private val mediaItemViewModel: MediaItemViewModel by viewModel { parametersOf("__radio__") }
+    private val mediaItemViewModel: MediaItemViewModel by viewModel { parametersOf(MediaBrowser.RADIO_ROOT) }
 
     private val listAdapter = MediaItemAdapter {
         mediaSessionViewModel.playMedia(it.id)

@@ -1,4 +1,4 @@
-package ro.expectations.radio.media
+package ro.expectations.radio.media.playback
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -24,18 +24,19 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import mu.KotlinLogging
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.slf4j.impl.HandroidLoggerAdapter
+import ro.expectations.radio.media.BuildConfig
 import ro.expectations.radio.media.extensions.stateName
-import ro.expectations.radio.media.library.MediaBrowser
+import ro.expectations.radio.media.browser.MediaBrowser
+import ro.expectations.radio.media.repository.RadioRepository
 
 private val logger = KotlinLogging.logger {}
 
 class PlaybackService : MediaBrowserServiceCompat() {
 
-    private lateinit var mediaBrowser: MediaBrowser
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
@@ -55,18 +56,14 @@ class PlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
+    private val mediaBrowser: MediaBrowser by inject()
+
     override fun onCreate() {
         super.onCreate()
 
         // Set up logging
         HandroidLoggerAdapter.DEBUG = BuildConfig.DEBUG
         HandroidLoggerAdapter.APP_NAME = "ExR"
-
-        // initialise the media library
-        mediaBrowser = MediaBrowser(
-            FirebaseAuth.getInstance(),
-            FirebaseFirestore.getInstance()
-        )
 
         // Build a PendingIntent that can be used to launch the UI.
         val sessionIntent = packageManager?.getLaunchIntentForPackage(packageName)
@@ -86,7 +83,8 @@ class PlaybackService : MediaBrowserServiceCompat() {
         notificationManager = NotificationManagerCompat.from(this)
 
         // Receiver for handling the becoming noisy event.
-        becomingNoisyReceiver = BecomingNoisyReceiver(this, mediaSession.sessionToken)
+        becomingNoisyReceiver =
+            BecomingNoisyReceiver(this, mediaSession.sessionToken)
 
         // Register a session controller callback to receive updates from the session.
         mediaSession.controller.registerCallback(MediaControllerCallback())
@@ -100,7 +98,14 @@ class PlaybackService : MediaBrowserServiceCompat() {
             // Set the playback preparer
             val userAgent = Util.getUserAgent(this, "Expect Radio")
             val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
-            it.setPlaybackPreparer(PlaybackPreparer(mediaBrowser, exoPlayer, dataSourceFactory))
+            val radioRepository: RadioRepository = get()
+            it.setPlaybackPreparer(
+                PlaybackPreparer(
+                    radioRepository,
+                    exoPlayer,
+                    dataSourceFactory
+                )
+            )
 
             // Set the default queue navigator
             it.setQueueNavigator(QueueNavigator(mediaSession))
@@ -229,9 +234,10 @@ class PlaybackService : MediaBrowserServiceCompat() {
  * Helper class for listening for when headphones are unplugged (or the audio
  * will otherwise cause playback to become "noisy").
  */
-private class BecomingNoisyReceiver(private val context: Context,
-                                    sessionToken: MediaSessionCompat.Token)
-    : BroadcastReceiver() {
+private class BecomingNoisyReceiver(
+    private val context: Context,
+    sessionToken: MediaSessionCompat.Token
+) : BroadcastReceiver() {
 
     private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
     private val controller = MediaControllerCompat(context, sessionToken)

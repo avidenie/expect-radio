@@ -6,7 +6,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import ro.expectations.radio.MediaSessionConnection
-import ro.expectations.radio.media.PlaybackService
+import ro.expectations.radio.media.playback.PlaybackService
 import ro.expectations.radio.viewmodels.MediaItemViewModel
 import ro.expectations.radio.viewmodels.MediaSessionViewModel
 

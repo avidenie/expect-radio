@@ -4,6 +4,7 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import ro.expectations.radio.di.viewModelsModule
+import ro.expectations.radio.media.di.mediaModule
 
 class MainApplication : Application() {
 
@@ -16,7 +17,7 @@ class MainApplication : Application() {
             androidContext(this@MainApplication)
 
             // application modules
-            modules(viewModelsModule)
+            modules(viewModelsModule, mediaModule)
         }
     }
 }
