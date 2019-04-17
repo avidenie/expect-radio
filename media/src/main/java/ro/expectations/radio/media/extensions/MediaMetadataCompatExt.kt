@@ -13,6 +13,9 @@ import com.google.android.exoplayer2.upstream.DataSource
  * Useful extensions for [MediaMetadataCompat].
  */
 
+inline val MediaMetadataCompat.mediaId: String
+    get() = this.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+
 inline val MediaMetadataCompat.mediaUri: Uri?
     get() = Uri.parse(this.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))
 
@@ -35,7 +38,7 @@ inline val MediaMetadataCompat.fullDescription: MediaDescriptionCompat
  */
 fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory): ProgressiveMediaSource? =
     ProgressiveMediaSource.Factory(dataSourceFactory)
-        .setTag(fullDescription)
+        .setTag(mediaId)
         .createMediaSource(mediaUri)
 
 /**

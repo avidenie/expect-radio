@@ -3,23 +3,23 @@ package ro.expectations.radio.media.playback
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import com.google.android.exoplayer2.ControlDispatcher
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.PlaybackPreparer.ACTIONS
-import com.google.android.exoplayer2.upstream.DataSource
 import mu.KotlinLogging
-import ro.expectations.radio.media.extensions.toMediaSource
+import ro.expectations.radio.media.repository.MusicRepository
+import ro.expectations.radio.media.repository.PodcastRepository
 import ro.expectations.radio.media.repository.RadioRepository
 
 private val logger = KotlinLogging.logger {}
 
-class PlaybackPreparer(private val radioRepository: RadioRepository,
-                       private val exoPlayer: ExoPlayer,
-                       private val dataSourceFactory: DataSource.Factory)
-    : MediaSessionConnector.PlaybackPreparer {
+class PlaybackPreparer(
+    private val queueManager: QueueManager,
+    private val radioRepository: RadioRepository,
+    private val musicRepository: MusicRepository,
+    private val podcastRepository: PodcastRepository
+) : MediaSessionConnector.PlaybackPreparer {
 
     override fun getSupportedPrepareActions(): Long {
         logger.debug { "getSupportedPrepareActions" }
@@ -35,16 +35,7 @@ class PlaybackPreparer(private val radioRepository: RadioRepository,
         radioRepository
             .getRadios()
             .addOnSuccessListener { radios ->
-
-                var currentWindowIndex = radios?.indexOfFirst {
-                    it.getText(METADATA_KEY_MEDIA_ID) == mediaId
-                }
-                if (currentWindowIndex == null || currentWindowIndex == -1) {
-                    currentWindowIndex = 0
-                }
-
-                exoPlayer.prepare(radios?.toMediaSource(dataSourceFactory))
-                exoPlayer.seekTo(currentWindowIndex, 0)
+                queueManager.publishQueue(radios, mediaId)
             }
             .addOnFailureListener {
                 // todo: notify caller of the error

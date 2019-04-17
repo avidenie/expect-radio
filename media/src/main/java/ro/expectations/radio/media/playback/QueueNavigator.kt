@@ -3,18 +3,17 @@ package ro.expectations.radio.media.playback
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ControlDispatcher
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 
-class QueueNavigator(mediaSession: MediaSessionCompat?) : TimelineQueueNavigator(mediaSession) {
+class QueueNavigator(mediaSession: MediaSessionCompat, private val queueManager: QueueManager) : TimelineQueueNavigator(mediaSession) {
 
     private val window = Timeline.Window()
 
-    override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat =
-        player?.currentTimeline?.getWindow(windowIndex, window, true)?.tag as MediaDescriptionCompat
+    override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat {
+        val mediaId = player?.currentTimeline?.getWindow(windowIndex, window, true)?.tag as String
+        return queueManager.getMediaDescription(mediaId)
+    }
 
     override fun getSupportedQueueNavigatorActions(player: Player): Long {
 

@@ -27,11 +27,11 @@ import com.google.android.exoplayer2.util.Util
 import mu.KotlinLogging
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.slf4j.impl.HandroidLoggerAdapter
 import ro.expectations.radio.media.BuildConfig
-import ro.expectations.radio.media.extensions.stateName
 import ro.expectations.radio.media.browser.MediaBrowser
-import ro.expectations.radio.media.repository.RadioRepository
+import ro.expectations.radio.media.extensions.stateName
 
 private val logger = KotlinLogging.logger {}
 
@@ -45,7 +45,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
     private var isForegroundService = false
 
-    private val exoPlayer: ExoPlayer by lazy {
+    private val player: ExoPlayer by lazy {
         ExoPlayerFactory.newSimpleInstance(this).apply {
             val audioAttributes = AudioAttributes.Builder()
                 .setContentType(C.CONTENT_TYPE_MUSIC)
@@ -93,22 +93,19 @@ class PlaybackService : MediaBrowserServiceCompat() {
         mediaSessionConnector = MediaSessionConnector(mediaSession).also {
 
             // Initialise and set the player
-            it.setPlayer(exoPlayer)
+            it.setPlayer(player)
 
-            // Set the playback preparer
+            // Set up the queue manager, used by both the playback preparer and the queue navigator
             val userAgent = Util.getUserAgent(this, "Expect Radio")
             val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
-            val radioRepository: RadioRepository = get()
-            it.setPlaybackPreparer(
-                PlaybackPreparer(
-                    radioRepository,
-                    exoPlayer,
-                    dataSourceFactory
-                )
-            )
+            val queueManager = QueueManager(player, dataSourceFactory)
+
+            // Set the playback preparer
+            val playbackPreparer: PlaybackPreparer = get { parametersOf(queueManager) }
+            it.setPlaybackPreparer(playbackPreparer)
 
             // Set the default queue navigator
-            it.setQueueNavigator(QueueNavigator(mediaSession))
+            it.setQueueNavigator(QueueNavigator(mediaSession, queueManager))
         }
     }
 
@@ -127,7 +124,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
          * be reported as [PlaybackStateCompat.STATE_NONE], the service will first remove
          * itself as a foreground service, and will then call [stopSelf].
          */
-        exoPlayer.stop(true)
+        player.stop(true)
     }
 
     override fun onDestroy() {
@@ -144,7 +141,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
-    ): MediaBrowserServiceCompat.BrowserRoot? {
+    ): BrowserRoot? {
 
         logger.debug { "onGetRoot: $clientPackageName, $clientUid, $rootHints" }
 
@@ -187,9 +184,7 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
         private fun updateNotification(state: PlaybackStateCompat) {
 
-            val updatedState = state.state
-
-            when (updatedState) {
+            when (state.state) {
                 PlaybackStateCompat.STATE_CONNECTING,
                 PlaybackStateCompat.STATE_BUFFERING,
                 PlaybackStateCompat.STATE_PLAYING -> {
