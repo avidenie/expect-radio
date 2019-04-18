@@ -60,12 +60,12 @@ dependencies {
     implementation deps.navigation.fragment_ktx
     implementation deps.navigation.ui_ktx
 
+    // Glide image loading library
+    implementation deps.glide
+
     // Logging
     implementation deps.log.kotlin_logging
     implementation deps.log.slf4j_handroid
-
-    // Glide image loading library
-    implementation deps.glide
 
     // Testing
     testImplementation deps.test.junit

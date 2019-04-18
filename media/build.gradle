@@ -46,6 +46,9 @@ dependencies {
     implementation deps.firebase.auth
     implementation deps.firebase.firestore
 
+    // Glide image loading library
+    implementation deps.glide
+
     // Logging
     implementation deps.log.kotlin_logging
     implementation deps.log.slf4j_handroid

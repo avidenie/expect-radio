@@ -5,12 +5,15 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.upstream.DataSource
+import mu.KotlinLogging
 import ro.expectations.radio.media.extensions.mediaId
 import ro.expectations.radio.media.extensions.toMediaSource
 
+private val logger = KotlinLogging.logger {}
+
 class QueueManager(private val player: ExoPlayer, private val dataSourceFactory: DataSource.Factory) {
 
-    private var queue: List<MediaMetadataCompat> = listOf()
+    private var queue: MutableList<MediaMetadataCompat> = mutableListOf()
 
     fun getMediaDescription(mediaId: String): MediaDescriptionCompat {
         var mediaMetadata = queue.find { it.mediaId == mediaId }
@@ -21,7 +24,7 @@ class QueueManager(private val player: ExoPlayer, private val dataSourceFactory:
     }
 
     fun publishQueue(newQueue: List<MediaMetadataCompat>, windowIndex: Int = 0) {
-        queue = newQueue
+        queue = newQueue.toMutableList()
         player.prepare(queue.toMediaSource(dataSourceFactory))
         player.seekTo(windowIndex, 0)
     }
@@ -34,5 +37,14 @@ class QueueManager(private val player: ExoPlayer, private val dataSourceFactory:
             windowIndex = 0
         }
         publishQueue(newQueue, windowIndex)
+    }
+
+    fun updateMetadata(mediaMetadata: MediaMetadataCompat) {
+        var windowIndex = queue.indexOfFirst {
+            it.mediaId == mediaMetadata.mediaId
+        }
+        if (windowIndex != -1) {
+            queue[windowIndex] = mediaMetadata
+        }
     }
 }

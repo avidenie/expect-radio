@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
@@ -14,6 +16,10 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -56,6 +62,14 @@ class PlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
+    // Set up the queue manager, used by both the playback preparer and the queue navigator
+    private val queueManager: QueueManager by lazy {
+        val userAgent = Util.getUserAgent(this, "Expect Radio")
+        val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
+        QueueManager(player, dataSourceFactory)
+    }
+
+
     private val mediaBrowser: MediaBrowser by inject()
 
     override fun onCreate() {
@@ -94,11 +108,6 @@ class PlaybackService : MediaBrowserServiceCompat() {
 
             // Initialise and set the player
             it.setPlayer(player)
-
-            // Set up the queue manager, used by both the playback preparer and the queue navigator
-            val userAgent = Util.getUserAgent(this, "Expect Radio")
-            val dataSourceFactory = DefaultDataSourceFactory(this, userAgent, null)
-            val queueManager = QueueManager(player, dataSourceFactory)
 
             // Set the playback preparer
             val playbackPreparer: PlaybackPreparer = get { parametersOf(queueManager) }
@@ -170,6 +179,25 @@ class PlaybackService : MediaBrowserServiceCompat() {
             logger.debug { "MediaControllerCallback::onMetadataChanged: ${metadata?.description}" }
 
             if (metadata != null) {
+                if (metadata.description.iconBitmap == null) {
+                    logger.error { "iconUri: ${metadata.description.iconUri}" }
+                    Glide.with(applicationContext)
+                        .asBitmap()
+                        .load(metadata.description.iconUri)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                queueManager.updateMetadata(
+                                    MediaMetadataCompat.Builder(metadata)
+                                        .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, resource)
+                                        .build()
+                                )
+                                mediaSessionConnector.invalidateMediaSessionQueue()
+                                mediaSessionConnector.invalidateMediaSessionMetadata()
+                            }
+                        })
+                }
                 mediaSession.controller.playbackState?.let { updateNotification(it) }
             }
         }
