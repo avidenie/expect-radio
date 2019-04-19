@@ -57,7 +57,9 @@ class PlaybackService : MediaBrowserServiceCompat() {
                 .setUsage(C.USAGE_MEDIA)
                 .build()
             setAudioAttributes(audioAttributes, true)
-            addAnalyticsListener(EventLogger(DefaultTrackSelector()))
+            if (BuildConfig.DEBUG) {
+                addAnalyticsListener(EventLogger(DefaultTrackSelector()))
+            }
         }
     }
 
