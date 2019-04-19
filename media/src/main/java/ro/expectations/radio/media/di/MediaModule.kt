@@ -16,9 +16,10 @@ val mediaModule: Module = module {
 
     single { AuthProvider(FirebaseAuth.getInstance()) }
 
-    single { RadioRepository(get(), FirebaseFirestore.getInstance()) }
-    single { PodcastRepository(get(), FirebaseFirestore.getInstance()) }
-    single { MusicRepository(get(), FirebaseFirestore.getInstance()) }
+    single { FirebaseFirestore.getInstance() }
+    single { RadioRepository(get(), get()) }
+    single { PodcastRepository(get(), get()) }
+    single { MusicRepository(get(), get()) }
 
     single { MediaBrowser(get(), get(), get(), get()) }
     single { (queueManager: QueueManager) -> PlaybackPreparer(queueManager, get(), get(), get()) }
