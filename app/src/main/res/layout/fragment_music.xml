@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MusicFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque interdum fermentum pulvinar. Quisque purus nibh, bibendum porta sodales sit amet, aliquam eu dolor. Sed sit amet justo in enim rhoncus aliquet nec consectetur diam. Vivamus eu malesuada dui. Curabitur ante urna, rutrum in lacus sollicitudin, dignissim faucibus augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis nisl metus, tristique sit amet euismod at, tristique eget enim. Vestibulum auctor sapien et commodo mattis.
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque interdum fermentum pulvinar. Quisque purus nibh, bibendum porta sodales sit amet, aliquam eu dolor. Sed sit amet justo in enim rhoncus aliquet nec consectetur diam. Vivamus eu malesuada dui. Curabitur ante urna, rutrum in lacus sollicitudin, dignissim faucibus augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis nisl metus, tristique sit amet euismod at, tristique eget enim. Vestibulum auctor sapien et commodo mattis.
 
 Nam egestas erat eu lacus tempus eleifend. Sed euismod ipsum ac massa congue, quis finibus tellus porttitor. Sed ex lorem, blandit id neque sed, placerat commodo mi. Morbi justo nibh, maximus vitae elementum non, bibendum et justo. Curabitur a tincidunt nisl, quis convallis lectus. Curabitur non ex viverra, tristique augue a, blandit nibh. Integer ullamcorper condimentum varius. Pellentesque sem leo, fermentum dignissim magna nec, facilisis ultricies lectus. Nunc sed sollicitudin diam, ut pharetra justo.
 
@@ -23,10 +20,9 @@ Sed vulputate egestas justo, vel sollicitudin erat elementum varius. Phasellus a
 Vivamus non ipsum elit. Nullam scelerisque mauris eget congue porta. Sed vel metus sit amet libero viverra posuere in in nunc. Donec imperdiet leo sit amet sem tristique venenatis. Donec turpis massa, auctor ac risus sit amet, luctus luctus turpis. Quisque dolor nulla, ornare id nibh nec, eleifend vehicula velit. Ut eget magna feugiat, ultricies tortor in, semper neque. Sed sodales lacinia lorem, ac euismod ligula suscipit eu. In porttitor finibus odio, vel imperdiet diam euismod vel. Proin eget mi a dolor imperdiet fringilla. Ut ut fringilla lacus. Integer in sodales eros. Proin scelerisque, enim a tristique auctor, purus ante scelerisque odio, eu rutrum lacus neque id orci. Cras eu congue sapien. Curabitur vehicula tortor vel fringilla lacinia.
 
 Aenean aliquet, nibh vitae posuere varius, est orci auctor ante, eu rutrum enim justo id magna. Fusce consequat quam ex. Curabitur erat ex, tincidunt faucibus volutpat vel, consectetur ut mauris. Donec risus justo, pulvinar quis finibus vel, hendrerit vel quam. In nec dolor ut neque tristique posuere eget vitae nisi. Maecenas semper nec arcu ac blandit. Vestibulum elementum, dui eu fermentum facilisis, lacus turpis pellentesque ligula, et blandit erat lectus eu orci. Vestibulum ex purus, vestibulum vitae porttitor in, blandit non orci. Aenean lacus dui, accumsan ut tellus quis, malesuada hendrerit massa. Nullam in sodales ipsum, in vulputate ipsum. Sed iaculis eros nec nulla lobortis auctor."
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
