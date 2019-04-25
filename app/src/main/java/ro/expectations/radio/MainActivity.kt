@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_main.*
 import mu.KotlinLogging
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -79,7 +79,10 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean = currentNavController?.value?.navigateUp() ?: false
 
     override fun onBackPressed() {
-        if (currentNavController?.value?.popBackStack() != true) {
+        val bottomSheetBehaviour = (bottomSheet.layoutParams as CoordinatorLayout.LayoutParams).behavior as BottomSheetBehavior
+        if (bottomSheetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else if (currentNavController?.value?.popBackStack() != true) {
             super.onBackPressed()
         }
     }
@@ -102,8 +105,6 @@ class MainActivity : AppCompatActivity() {
             // setup the action bar
             NavigationUI.setupWithNavController(collapsingToolbar, toolbar, navController)
 
-            // and make sure the bottomNavigation is visible
-            ((bottomNavigation.layoutParams as CoordinatorLayout.LayoutParams).behavior as HideBottomViewOnScrollBehavior).slideUp(bottomNavigation)
         })
 
         currentNavController = controller
